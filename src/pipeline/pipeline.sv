@@ -85,7 +85,7 @@ forward_ctrl forward_ctrl(
     .out        (exe_data)
 );
 
-// Note: regfile is placed in the ID stage.
+// Note: regfile was placed in the ID stage.
 
 
 // each stage
@@ -121,7 +121,9 @@ stage_exe stage_exe(
     .exe_in     (id2exe_exe),
     .exe_out    (exe2mem_exe),
     .exe_if     (exe_if_fw),
-    .exe_mem    (exe_mem_fw)
+    .exe_mem_fw (exe_mem_fw),
+    .wb_exe_fw  (wb_exe_fw)
+
 );
 
 stage_mem stage_mem(

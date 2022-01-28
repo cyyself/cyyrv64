@@ -6,7 +6,7 @@ module sram64_trans(
     input        [63:0] memaddr,
     input               mem_write,
     // sram interface
-    output        [7:0] sram_wea,
+    output logic  [7:0] sram_wea,
     output logic [63:0] sram_dina,
     input        [63:0] sram_douta
 );

@@ -10,7 +10,8 @@ module stage_exe(
     input  id2exe       exe_in,
     output exe2mem      exe_out,
     output exe2if_fw    exe_if,
-    output exe2mem_fw   exe_mem
+    output exe2mem_fw   exe_mem_fw,
+    output wb2exe_fw    wb_exe_fw
 );
 
 assign exe_ready        = exe_data.valid;
@@ -18,12 +19,12 @@ assign exe_ready        = exe_data.valid;
 wire  [63:0] alu_a      = exe_ctrl.alu_pc  ? exe_pipe.pc :   exe_data.rs1;   // for auipc only
 wire  [63:0] alu_b      = exe_ctrl.alu_imm ? exe_in.imm  :   exe_data.rs2;
 
-assign exe_mem.mem_en   = exe_ctrl.mem_read | exe_ctrl.mem_write;
-assign exe_mem.mem_write= exe_ctrl.mem_write;
-assign exe_mem.rs2_data = exe_data.rs2;
-assign exe_mem.funct3   = exe_pipe.instr[`FUNCT3_IDX];
+assign exe_mem_fw.mem_en   = exe_ctrl.mem_read | exe_ctrl.mem_write;
+assign exe_mem_fw.mem_write= exe_ctrl.mem_write;
+assign exe_mem_fw.rs2_data = exe_data.rs2;
+assign exe_mem_fw.funct3   = exe_pipe.instr[`FUNCT3_IDX];
 // bypass alu to d_cache to get better timing
-assign exe_mem.memaddr  = exe_data.rs1  + exe_in.imm;
+assign exe_mem_fw.memaddr  = exe_data.rs1  + exe_in.imm;
 // bypass alu to i_cache to get better timing
 assign exe_if.exe_new_pc    = 
     exe_ctrl.branch ? (exe_pipe.pc + exe_in.imm) : 

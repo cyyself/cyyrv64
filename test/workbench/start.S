@@ -1,0 +1,1 @@
+addi zero,t0,1
