@@ -33,6 +33,7 @@ exe2mem         exe2mem_exe;
 exe2mem         exe2mem_mem;
 mem2wb          mem2wb_mem;
 mem2wb          mem2wb_wb;
+
 // flip-flops
 ff #(.WIDTH($bits(if_pipe))) if2id_ff(
     .clk        (clk),
@@ -121,9 +122,7 @@ stage_exe stage_exe(
     .exe_in     (id2exe_exe),
     .exe_out    (exe2mem_exe),
     .exe_if     (exe_if_fw),
-    .exe_mem_fw (exe_mem_fw),
-    .wb_exe_fw  (wb_exe_fw)
-
+    .exe_mem_fw (exe_mem_fw)
 );
 
 stage_mem stage_mem(
@@ -147,11 +146,12 @@ stage_wb stage_wb(
     .wb_ctrl    (wb_ctrl),
     .wb_pipe    (wb_pipe),
     .wb_in      (mem2wb_wb),
-    .wb_out     (wb_id_fw)
+    .wb_out     (wb_id_fw),
+    .wb_exe_fw  (wb_exe_fw)
 );
 
 // pipeline controller
-logic ctrl_trans_flush = exe_if_fw.exe_pc_src;
+wire ctrl_trans_flush = exe_if_fw.exe_pc_src;
 
 assign pipe_flush.IF    = 1'b0;
 assign pipe_flush.ID    = ctrl_trans_flush;
@@ -163,6 +163,6 @@ assign pipe_stall.WB    = !pipe_ready.WB;
 assign pipe_stall.MEM   = pipe_stall.WB  || !pipe_ready.MEM;
 assign pipe_stall.EXE   = pipe_stall.MEM || !pipe_ready.EXE;
 assign pipe_stall.ID    = pipe_stall.EXE || !pipe_ready.ID;
-assign pipe_stall.IF    = pipe_stall.IF  || !pipe_ready.IF;
+assign pipe_stall.IF    = pipe_stall.ID  || !pipe_ready.IF;
 
 endmodule

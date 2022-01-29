@@ -14,9 +14,9 @@ module sram #(
 
 (* ram_style="block" *) reg [LEN_DATA-1:0] ram [DEPTH-1:0];
 
-logic [$clog2(DEPTH)-1:0] line_addr = addra[$clog2(LEN_DATA/8) +: $clog2(DEPTH)];
-logic [LEN_DATA-1:0] write_mask;
-logic [LEN_DATA-1:0] new_data = (ram[line_addr] & (~write_mask)) | (dina & write_mask);
+wire [$clog2(DEPTH)-1:0] line_addr = addra[$clog2(LEN_DATA/8) +: $clog2(DEPTH)];
+wire [LEN_DATA-1:0] write_mask;
+wire [LEN_DATA-1:0] new_data = (ram[line_addr] & (~write_mask)) | (dina & write_mask);
 
 genvar i;
 generate

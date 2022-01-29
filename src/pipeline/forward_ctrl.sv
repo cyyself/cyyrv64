@@ -17,32 +17,32 @@ module forward_ctrl(
     output exe_data_fw  out
 );
 
-logic exe_rs1_en    = exe_ctrl.rs1_en;
-logic exe_rs2_en    = exe_ctrl.rs2_en;
-logic mem_rd_en     = mem_ctrl.rd_en;
-logic wb_rd_en      = wb_ctrl.rd_en;
+wire exe_rs1_en     = exe_ctrl.rs1_en;
+wire exe_rs2_en     = exe_ctrl.rs2_en;
+wire mem_rd_en      = mem_ctrl.rd_en;
+wire wb_rd_en       = wb_ctrl.rd_en;
 
-logic [4:0] exe_rs1 = exe_pipe.instr[`RS1_IDX];
-logic [4:0] exe_rs2 = exe_pipe.instr[`RS2_IDX];
-logic [4:0] mem_rd  = mem_pipe.instr[`RD_IDX];
-logic [4:0] wb_rd   = wb_pipe.instr[`RD_IDX];
+wire [4:0] exe_rs1  = exe_pipe.instr[`RS1_IDX];
+wire [4:0] exe_rs2  = exe_pipe.instr[`RS2_IDX];
+wire [4:0] mem_rd   = mem_pipe.instr[`RD_IDX];
+wire [4:0] wb_rd    = wb_pipe.instr[`RD_IDX];
 
-logic rs1_mem       = exe_rs1_en && mem_rd_en && exe_rs1 == mem_rd;
-logic rs2_mem       = exe_rs2_en && mem_rd_en && exe_rs2 == mem_rd;
-logic rs1_wb        = exe_rs1_en &&  wb_rd_en && exe_rs1 ==  wb_rd;
-logic rs2_wb        = exe_rs2_en &&  wb_rd_en && exe_rs2 ==  wb_rd;
+wire rs1_mem        = exe_rs1_en && mem_rd_en && exe_rs1 == mem_rd;
+wire rs2_mem        = exe_rs2_en && mem_rd_en && exe_rs2 == mem_rd;
+wire rs1_wb         = exe_rs1_en &&  wb_rd_en && exe_rs1 ==  wb_rd;
+wire rs2_wb         = exe_rs2_en &&  wb_rd_en && exe_rs2 ==  wb_rd;
 
 // should not forward during memory reading
-logic tmp_rs1_valid = !(exe_rs1_en && mem_rd_en && exe_rs1 == mem_rd && mem_ctrl.mem_read);
-logic tmp_rs2_valid = !(exe_rs2_en && mem_rd_en && exe_rs1 == mem_rd && mem_ctrl.mem_read);
-logic tmp_valid     = tmp_rs1_valid & tmp_rs2_valid;
+wire tmp_rs1_valid  = !(exe_rs1_en && mem_rd_en && exe_rs1 == mem_rd && mem_ctrl.mem_read);
+wire tmp_rs2_valid  = !(exe_rs2_en && mem_rd_en && exe_rs1 == mem_rd && mem_ctrl.mem_read);
+wire tmp_valid      = tmp_rs1_valid & tmp_rs2_valid;
 
-logic [63:0] tmp_rs1    = 
+wire [63:0] tmp_rs1 = 
     rs1_mem ? mem_result :
     rs1_wb  ? wb_result  :
     exe_in.reg_rs1;
 
-logic [63:0] tmp_rs2    = 
+wire [63:0] tmp_rs2 = 
     rs2_mem ? mem_result :
     rs2_wb  ? wb_result  :
     exe_in.reg_rs2;

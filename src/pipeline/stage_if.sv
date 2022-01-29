@@ -13,7 +13,7 @@ module stage_if(
 
 assign if_ready = 1'b1;
 
-logic [63:0] new_pc = 
+wire [63:0] new_pc  = 
     rst                     ? `RST_PC : 
     exe_if_fw.exe_pc_src    ? exe_if_fw.exe_new_pc : 
     if_stall                ? if_out.pc :
@@ -29,12 +29,12 @@ ff #(.WIDTH(64)) pcreg(
 );
 
 
-logic [31:0] instr;
+wire [31:0] instr;
 
 sram #(
     .LEN_ADDR(64),
     .DEPTH(1024),
-    .INIT_FILE("test1.hex")
+    .INIT_FILE("start.hex")
 ) sram (
     .addra  (new_pc),
     .clka   (clk),

@@ -10,8 +10,7 @@ module stage_exe(
     input  id2exe       exe_in,
     output exe2mem      exe_out,
     output exe2if_fw    exe_if,
-    output exe2mem_fw   exe_mem_fw,
-    output wb2exe_fw    wb_exe_fw
+    output exe2mem_fw   exe_mem_fw
 );
 
 assign exe_ready        = exe_data.valid;

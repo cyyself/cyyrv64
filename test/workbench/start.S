@@ -1,1 +1,1 @@
-addi zero,t0,1
+addi t0,zero,1

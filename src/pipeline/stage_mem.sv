@@ -14,10 +14,11 @@ module stage_mem(
 );
 
 assign mem_out.result   = mem_ctrl.jump ? (mem_pipe.pc + 4) : mem_in.alu_out;
+assign mem_exe_fw.result = mem_out.result;
 
-logic  [7:0] sram_wea;
-logic [63:0] sram_dina;
-logic [63:0] sram_douta;
+wire  [7:0] sram_wea;
+wire [63:0] sram_dina;
+wire [63:0] sram_douta;
 
 sram64_trans sram64_trans(
     .funct3     (exe_mem_fw.funct3),
