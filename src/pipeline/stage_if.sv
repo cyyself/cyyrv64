@@ -45,5 +45,6 @@ sram #(
 );
 
 assign if_out.instr = instr;
+assign if_out.valid = 1;
 
 endmodule

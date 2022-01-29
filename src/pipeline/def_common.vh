@@ -40,6 +40,7 @@ typedef struct packed {
 typedef struct packed {
     logic [63:0]    pc;
     logic [31:0]    instr;
+    logic           valid; // avoid bubble entering exception
 } pipe_common; // TODO: IF error signal
 
 `define FUNCT3_IDX  14:12
