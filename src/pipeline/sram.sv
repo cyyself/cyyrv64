@@ -26,7 +26,7 @@ endgenerate
 integer j;
 
 initial begin
-    for (j=0;j<LEN_DATA;j++) ram[j] = 0;
+    for (j=0;j<DEPTH;j++) ram[j] = 0;
     if (INIT_FILE != "") $readmemh(INIT_FILE, ram);
 end
 
