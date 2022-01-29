@@ -1,6 +1,7 @@
 `include "def_inst.vh"
 module sram64_trans(
-    input         [2:0] funct3,
+    input         [2:0] funct3_read,
+    input         [2:0] funct3_write,
     input        [63:0] writedata,
     output logic [63:0] readdata,
     input        [63:0] memaddr,
@@ -12,7 +13,7 @@ module sram64_trans(
 );
 
 always_comb begin : read_translate
-    case (funct3)
+    case (funct3_read)
         `FUNCT3_LB:
             readdata = {{56{sram_douta[{memaddr[2:0],3'b111}]}},sram_douta[{memaddr[2:0],3'd0} +: 8]};
         `FUNCT3_LBU:
@@ -34,7 +35,7 @@ end
 
 always_comb begin : write_translate
     if (mem_write) begin
-        case (funct3)
+        case (funct3_write)
             `FUNCT3_SB: begin
                 sram_wea    = (8'b1 << {5'd0,memaddr[2:0]});
                 sram_dina   = {56'd0,writedata[7:0]} << {58'd0,memaddr[2:0],3'd0};

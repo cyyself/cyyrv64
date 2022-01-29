@@ -154,10 +154,10 @@ stage_wb stage_wb(
 wire ctrl_trans_flush = exe_if_fw.exe_pc_src;
 
 assign pipe_flush.IF    = 1'b0;
-assign pipe_flush.ID    = ctrl_trans_flush;
-assign pipe_flush.EXE   = ctrl_trans_flush;
-assign pipe_flush.MEM   = 1'b0;
-assign pipe_flush.WB    = 1'b0;
+assign pipe_flush.ID    = (pipe_stall.IF && !pipe_stall.ID ) || ctrl_trans_flush;
+assign pipe_flush.EXE   = (pipe_stall.ID && !pipe_stall.EXE) || ctrl_trans_flush;
+assign pipe_flush.MEM   = (pipe_stall.EXE && !pipe_stall.MEM);
+assign pipe_flush.WB    = (pipe_stall.MEM && !pipe_stall.WB);
 
 assign pipe_stall.WB    = !pipe_ready.WB;
 assign pipe_stall.MEM   = pipe_stall.WB  || !pipe_ready.MEM;

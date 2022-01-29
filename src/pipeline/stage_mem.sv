@@ -21,14 +21,15 @@ wire [63:0] sram_dina;
 wire [63:0] sram_douta;
 
 sram64_trans sram64_trans(
-    .funct3     (exe_mem_fw.funct3),
-    .writedata  (exe_mem_fw.rs2_data),
-    .readdata   (mem_out.readdata),
-    .memaddr    (exe_mem_fw.memaddr),
-    .mem_write  (exe_mem_fw.mem_write),
-    .sram_wea   (sram_wea),
-    .sram_dina  (sram_dina),
-    .sram_douta (sram_douta)
+    .funct3_read    (mem_pipe.instr[`FUNCT3_IDX]),
+    .funct3_write   (exe_mem_fw.funct3),
+    .writedata      (exe_mem_fw.rs2_data),
+    .readdata       (mem_out.readdata),
+    .memaddr        (exe_mem_fw.memaddr),
+    .mem_write      (exe_mem_fw.mem_write),
+    .sram_wea       (sram_wea),
+    .sram_dina      (sram_dina),
+    .sram_douta     (sram_douta)
 );
 
 sram #(
