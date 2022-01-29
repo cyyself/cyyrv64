@@ -177,7 +177,7 @@ always_comb begin : decoder
             id_ctrl.alu_32      = 1;
             id_ctrl.rs1_en      = 1;
             id_ctrl.rs2_en      = 1;
-            id_ctrl.rd_en       = 1;
+            id_ctrl.rd_en       = |rd;
             case (funct3)
                 `FUNCT3_ADD_SUB: begin
                     case (funct7)
