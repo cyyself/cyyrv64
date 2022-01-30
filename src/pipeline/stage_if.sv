@@ -8,7 +8,10 @@ module stage_if(
     input               if_flush,
     output              if_ready,
     input  exe2if_fw    exe_if_fw,
-    output pipe_common  if_out
+    output pipe_common  if_out,
+    output [63:0]       inst_addra,
+    input  [31:0]       inst_douta,
+    output              inst_ena
 );
 
 assign if_ready = 1'b1;
@@ -29,20 +32,10 @@ ff #(.WIDTH(64)) pcreg(
 );
 
 
-wire [31:0] instr;
+wire [31:0] instr = inst_douta;
 
-sram #(
-    .LEN_ADDR(64),
-    .DEPTH(1024),
-    .INIT_FILE("start.hex")
-) sram (
-    .addra  (new_pc),
-    .clka   (clk),
-    .dina   (0),
-    .douta  (instr),
-    .ena    (1'b1),
-    .wea    (4'd0)
-);
+assign inst_addra   = new_pc;
+assign inst_ena     = 1;
 
 assign if_out.instr = instr;
 assign if_out.valid = 1;

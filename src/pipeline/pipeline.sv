@@ -1,7 +1,15 @@
 `include "def_common.vh"
 module pipeline(
-    input   clk,
-    input   rst
+    input           clk,
+    input           rst,
+    output [63:0]   inst_addra,
+    input  [31:0]   inst_douta,
+    output          inst_ena,
+    output [63:0]   data_addra,
+    output [63:0]   data_dina,
+    input  [63:0]   data_douta,
+    output          data_ena,
+    output [7:0]    data_wea
 );
 
 // stall forward
@@ -97,7 +105,10 @@ stage_if stage_if(
     .if_flush   (pipe_flush.IF),
     .if_ready   (pipe_ready.IF),
     .exe_if_fw  (exe_if_fw),
-    .if_out     (if_pipe)
+    .if_out     (if_pipe),
+    .inst_addra (inst_addra),
+    .inst_douta (inst_douta),
+    .inst_ena   (inst_ena)
 );
 
 stage_id stage_id(
@@ -135,7 +146,12 @@ stage_mem stage_mem(
     .mem_in     (exe2mem_mem),
     .mem_out    (mem2wb_mem),
     .exe_mem_fw (exe_mem_fw),
-    .mem_exe_fw (mem_exe_fw)
+    .mem_exe_fw (mem_exe_fw),
+    .data_addra (data_addra),
+    .data_dina  (data_dina),
+    .data_douta (data_douta),
+    .data_ena   (data_ena),
+    .data_wea   (data_wea)
 );
 
 stage_wb stage_wb(
