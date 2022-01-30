@@ -21,7 +21,7 @@ module regfile(
         end
         else if (write_ena) begin
             regs[write_addr] <= write_data;
-            assert (write_ena && write_addr == 0) begin
+            assert (write_addr != 0) begin
                 $display("error");
                 $stop;
             end
