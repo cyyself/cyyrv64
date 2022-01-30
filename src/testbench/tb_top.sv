@@ -7,7 +7,7 @@ initial #100 rst = 0;
 
 always #5 clk = ~clk;
 
-pipeline pipeline(
+cpu_top cpu_top(
     .clk    (clk),
     .rst    (rst)
 );
