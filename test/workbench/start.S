@@ -79,8 +79,6 @@ li  t1,'n'
 sb  t1,0(a0)
 li  t1,'t'
 sb  t1,0(a0)
-li  t1,'s'
-sb  t1,0(a0)
 li  t1,' '
 sb  t1,0(a0)
 li  t1,'t'
@@ -95,7 +93,7 @@ li  t1,'e'
 sb  t1,0(a0)
 li  t1,' '
 sb  t1,0(a0)
-li  t1,'f'
+li  t1,'F'
 sb  t1,0(a0)
 li  t1,'r'
 sb  t1,0(a0)
