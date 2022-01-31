@@ -47,6 +47,6 @@ blu blu(
     .taken  (branch_taken)
 );
 
-assign exe_if.exe_pc_src = (exe_ctrl.branch || exe_ctrl.jump) && exe_data.valid && branch_taken;
+assign exe_if.exe_pc_src = ( (exe_ctrl.branch && branch_taken) || exe_ctrl.jump) && exe_data.valid;
 
 endmodule
