@@ -62,6 +62,7 @@ typedef struct packed {
 
 typedef struct packed {
     logic [63:0]    alu_out;
+    logic [63:0]    memaddr;
 } exe2mem;
 
 typedef struct packed {

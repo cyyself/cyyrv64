@@ -23,6 +23,7 @@ int cmain() {
     *((volatile char*)UART_BASE + UART_TX) = 'i';
     *((volatile char*)UART_BASE + UART_TX) = 'n';
     *((volatile char*)UART_BASE + UART_TX) = 'g';
+    *((volatile char*)UART_BASE + UART_TX) = '\n';
     char s[20];
     s[0] = 'H';
     s[1] = 'e';
@@ -39,6 +40,5 @@ int cmain() {
     s[12]= '\n';
     s[13]= 0;
     print_s(s);
-    *((volatile char*)UART_BASE + UART_TX) = s[0];
     return 0;
 }
