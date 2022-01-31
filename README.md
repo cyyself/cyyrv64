@@ -1,8 +1,10 @@
 # cyyrv64
 
-一个简单的RISC-V CPU实现，未来可能更名为我更喜欢的名字。
+A simple implementation of RISC-V CPU.
 
-# 当前进度
+Maybe renamed in the future.
+
+# Progress
 
 - [x] RV64I
 - [ ] M Extension
