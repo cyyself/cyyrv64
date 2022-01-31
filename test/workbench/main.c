@@ -5,7 +5,7 @@
 #define UART_LSR_TEMT		0x40 /* Transmitter empty */
 void uart_put_c(char c) {
     //while (!(*((char*)UART_BASE + UART_LSR) & (UART_LSR_TEMT)));
-    *((volatile char*)UART_BASE + UART_TX) = *c;
+    *((volatile char*)UART_BASE + UART_TX) = c;
 }
 
 void print_s(const char *c) {
@@ -16,6 +16,13 @@ void print_s(const char *c) {
 }
 
 int cmain() {
+    *((volatile char*)UART_BASE + UART_TX) = 'b';
+    *((volatile char*)UART_BASE + UART_TX) = 'o';
+    *((volatile char*)UART_BASE + UART_TX) = 'o';
+    *((volatile char*)UART_BASE + UART_TX) = 't';
+    *((volatile char*)UART_BASE + UART_TX) = 'i';
+    *((volatile char*)UART_BASE + UART_TX) = 'n';
+    *((volatile char*)UART_BASE + UART_TX) = 'g';
     char s[20];
     s[0] = 'H';
     s[1] = 'e';
@@ -32,5 +39,6 @@ int cmain() {
     s[12]= '\n';
     s[13]= 0;
     print_s(s);
+    *((volatile char*)UART_BASE + UART_TX) = s[0];
     return 0;
 }

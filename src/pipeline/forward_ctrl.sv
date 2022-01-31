@@ -34,8 +34,7 @@ wire rs2_wb         = exe_rs2_en &&  wb_rd_en && exe_rs2 ==  wb_rd;
 
 // should not forward during memory reading
 wire tmp_rs1_valid  = !(exe_rs1_en && mem_rd_en && exe_rs1 == mem_rd && mem_ctrl.mem_read);
-wire tmp_rs2_valid  = !(exe_rs2_en && mem_rd_en && exe_rs1 == mem_rd && mem_ctrl.mem_read);
-wire tmp_valid      = tmp_rs1_valid & tmp_rs2_valid;
+wire tmp_rs2_valid  = !(exe_rs2_en && mem_rd_en && exe_rs2 == mem_rd && mem_ctrl.mem_read);
 
 wire [63:0] tmp_rs1 = 
     rs1_mem ? mem_result :
@@ -48,25 +47,32 @@ wire [63:0] tmp_rs2 =
     exe_in.reg_rs2;
 
 // reserve station
-logic reserve_flag          = 0;
+logic reserve_rs1_flag       = 0;
+logic reserve_rs2_flag       = 0;
 logic [63:0] reserve_rs1    = 0;
 logic [63:0] reserve_rs2    = 0;
 
 always_ff @(posedge clk) begin
     if (rst | exe_ready | exe_flush) begin
-        reserve_flag <= 0;
-        reserve_rs1  <= 0;
-        reserve_rs2  <= 0;
+        reserve_rs1_flag    <= 0;
+        reserve_rs2_flag    <= 0;
+        reserve_rs1         <= 0;
+        reserve_rs2         <= 0;
     end
-    else if (tmp_valid)  begin // !exe_ready & tmp_valid means some module in exe stage didn't finished
-        reserve_flag <= 1;
-        reserve_rs1  <= tmp_rs1;
-        reserve_rs2  <= tmp_rs2;
+    else begin // !exe_ready means some module in exe stage didn't finished or forward data didn't fetched
+        if (tmp_rs1_valid) begin
+            reserve_rs1_flag <= 1;
+            reserve_rs1      <= tmp_rs1;
+        end
+        if (tmp_rs2_valid) begin
+            reserve_rs2_flag <= 1;
+            reserve_rs2      <= tmp_rs1;
+        end
     end
 end
 
-assign out.valid = reserve_flag | tmp_valid;
-assign out.rs1   = reserve_flag ? reserve_rs1 : tmp_rs1;
-assign out.rs2   = reserve_flag ? reserve_rs2 : tmp_rs2;
+assign out.valid = (tmp_rs1_valid || reserve_rs1_flag) && (tmp_rs2_valid || reserve_rs2_flag);
+assign out.rs1   = reserve_rs1_flag ? reserve_rs1 : tmp_rs1;
+assign out.rs2   = reserve_rs2_flag ? reserve_rs2 : tmp_rs2;
 
 endmodule

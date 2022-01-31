@@ -2,6 +2,7 @@ module sram_xbar #(
     parameter LEN_ADDR  = 32,
     parameter LEN_DATA  = 32
 ) (
+    input                   clk,
     input                   slave_mux_in,
     input  [LEN_ADDR-1:0]   master_addra,
     input  [LEN_DATA-1:0]   master_dina,
@@ -20,17 +21,24 @@ module sram_xbar #(
     output [LEN_DATA/8-1:0] slave1_wea
 );
 
+logic last_mux;
+
+always_ff @(posedge clk) begin
+    last_mux <= slave_mux_in;
+end
+
 assign slave0_ena   = slave_mux_in == 0 && master_ena;
 assign slave1_ena   = slave_mux_in == 1 && master_ena;
 
 assign slave0_wea   = slave_mux_in == 0 ? master_wea : 0;
 assign slave1_wea   = slave_mux_in == 1 ? master_wea : 0;
 
-assign master_douta = slave_mux_in ? slave1_douta : slave0_douta;
+assign master_douta = last_mux ? slave1_douta : slave0_douta;
 
 assign slave0_addra = master_addra;
 assign slave1_addra = master_addra;
 
 assign slave0_dina  = master_dina;
 assign slave1_dina  = master_dina;
+
 endmodule

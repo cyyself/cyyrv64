@@ -5,6 +5,8 @@ OBJDUMP :=  $(TOOL)objdump
 
 .PHONY: clean
 
+all: start.hex dump.S
+
 start.hex: start.bin
 	od -t x4 -An -w4 -v $< > $@
 

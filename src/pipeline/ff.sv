@@ -15,7 +15,7 @@ assign data_out = data;
 
 always_ff @(posedge clk) begin
     if (rst | flush) data <= 0;
-    else if (stall) data <= data_in;
+    else if (stall) data <= data;
     else data <= data_in;
 end
 

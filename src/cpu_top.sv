@@ -57,6 +57,7 @@ sram_xbar #(
     .LEN_ADDR(64),
     .LEN_DATA(64)
 ) sram_xbar (
+    .clk            (clk),
     .slave_mux_in   (slave_mux_in),
     .master_addra   (data_addra),
     .master_dina    (data_dina),

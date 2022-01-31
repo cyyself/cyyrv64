@@ -7,7 +7,7 @@ int main(int argc, char** argv, char** env) {
     unsigned long max_clk = 100000;
     while (!Verilated::gotFinish() && max_clk) {
         top->eval();
-        top->clk = !top->clk;
+        if (max_clk % 10 == 0) top->clk = !top->clk;
         max_clk --;
     }
     top->final();
