@@ -1,177 +1,46 @@
-la  a0,0x60000000
-li  t1,'c'
-sb  t1,0(a0)
-li  t1,'y'
-sb  t1,0(a0)
-li  t1,'y'
-sb  t1,0(a0)
-li  t1,'r'
-sb  t1,0(a0)
-li  t1,'v'
-sb  t1,0(a0)
-li  t1,'6'
-sb  t1,0(a0)
-li  t1,'4'
-sb  t1,0(a0)
-li  t1,' '
-sb  t1,0(a0)
-li  t1,'i'
-sb  t1,0(a0)
-li  t1,'s'
-sb  t1,0(a0)
-li  t1,' '
-sb  t1,0(a0)
-li  t1,'b'
-sb  t1,0(a0)
-li  t1,'o'
-sb  t1,0(a0)
-li  t1,'o'
-sb  t1,0(a0)
-li  t1,'t'
-sb  t1,0(a0)
-li  t1,'i'
-sb  t1,0(a0)
-li  t1,'n'
-sb  t1,0(a0)
-li  t1,'g'
-sb  t1,0(a0)
-li  t1,'\n'
-sb  t1,0(a0)
-li  t1,'I'
-sb  t1,0(a0)
-li  t1,'n'
-sb  t1,0(a0)
-li  t1,'s'
-sb  t1,0(a0)
-li  t1,'t'
-sb  t1,0(a0)
-li  t1,'r'
-sb  t1,0(a0)
-li  t1,'u'
-sb  t1,0(a0)
-li  t1,'c'
-sb  t1,0(a0)
-li  t1,'t'
-sb  t1,0(a0)
-li  t1,'i'
-sb  t1,0(a0)
-li  t1,'o'
-sb  t1,0(a0)
-li  t1,'n'
-sb  t1,0(a0)
-li  t1,' '
-sb  t1,0(a0)
-li  t1,'S'
-sb  t1,0(a0)
-li  t1,'e'
-sb  t1,0(a0)
-li  t1,'t'
-sb  t1,0(a0)
-li  t1,'s'
-sb  t1,0(a0)
-li  t1,' '
-sb  t1,0(a0)
-li  t1,'W'
-sb  t1,0(a0)
-li  t1,'a'
-sb  t1,0(a0)
-li  t1,'n'
-sb  t1,0(a0)
-li  t1,'t'
-sb  t1,0(a0)
-li  t1,' '
-sb  t1,0(a0)
-li  t1,'t'
-sb  t1,0(a0)
-li  t1,'o'
-sb  t1,0(a0)
-li  t1,' '
-sb  t1,0(a0)
-li  t1,'b'
-sb  t1,0(a0)
-li  t1,'e'
-sb  t1,0(a0)
-li  t1,' '
-sb  t1,0(a0)
-li  t1,'F'
-sb  t1,0(a0)
-li  t1,'r'
-sb  t1,0(a0)
-li  t1,'e'
-sb  t1,0(a0)
-li  t1,'e'
-sb  t1,0(a0)
-li  t1,'!'
-sb  t1,0(a0)
-li  t1,'\n'
-sb  t1,0(a0)
-li  t1,'h'
-sb  t1,0(a0)
-li  t1,'t'
-sb  t1,0(a0)
-li  t1,'t'
-sb  t1,0(a0)
-li  t1,'p'
-sb  t1,0(a0)
-li  t1,'s'
-sb  t1,0(a0)
-li  t1,':'
-sb  t1,0(a0)
-li  t1,'/'
-sb  t1,0(a0)
-li  t1,'/'
-sb  t1,0(a0)
-li  t1,'g'
-sb  t1,0(a0)
-li  t1,'i'
-sb  t1,0(a0)
-li  t1,'t'
-sb  t1,0(a0)
-li  t1,'h'
-sb  t1,0(a0)
-li  t1,'u'
-sb  t1,0(a0)
-li  t1,'b'
-sb  t1,0(a0)
-li  t1,'.'
-sb  t1,0(a0)
-li  t1,'c'
-sb  t1,0(a0)
-li  t1,'o'
-sb  t1,0(a0)
-li  t1,'m'
-sb  t1,0(a0)
-li  t1,'/'
-sb  t1,0(a0)
-li  t1,'c'
-sb  t1,0(a0)
-li  t1,'y'
-sb  t1,0(a0)
-li  t1,'y'
-sb  t1,0(a0)
-li  t1,'s'
-sb  t1,0(a0)
-li  t1,'e'
-sb  t1,0(a0)
-li  t1,'l'
-sb  t1,0(a0)
-li  t1,'f'
-sb  t1,0(a0)
-li  t1,'/'
-sb  t1,0(a0)
-li  t1,'c'
-sb  t1,0(a0)
-li  t1,'y'
-sb  t1,0(a0)
-li  t1,'y'
-sb  t1,0(a0)
-li  t1,'r'
-sb  t1,0(a0)
-li  t1,'v'
-sb  t1,0(a0)
-li  t1,'6'
-sb  t1,0(a0)
-li  t1,'4'
-sb  t1,0(a0)
-li  t1,'\n'
-sb  t1,0(a0)
+.text
+.globl _start
+_start:
+    li  x1, 0
+    li  x2, 0
+    li  x3, 0
+    li  x4, 0
+    li  x5, 0
+    li  x6, 0
+    li  x7, 0
+    li  x8, 0
+    li  x9, 0
+    li  x10, 0
+    li  x11, 0
+    li  x12, 0
+    li  x13, 0
+    li  x14, 0
+    li  x15, 0
+    li  x16, 0
+    li  x17, 0
+    li  x18, 0
+    li  x19, 0
+    li  x20, 0
+    li  x21, 0
+    li  x22, 0
+    li  x23, 0
+    li  x24, 0
+    li  x25, 0
+    li  x26, 0
+    li  x27, 0
+    li  x28, 0
+    li  x29, 0
+    li  x30, 0
+    li  x31, 0
+    la  sp, bootstacktop
+    jal cmain
+poweroff:
+    beq x0, x0, poweroff
+_stack:
+.section .data
+    .global bootstack
+bootstack:
+    .space 1024
+    .global bootstacktop
+bootstacktop:
+    .space 64

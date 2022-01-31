@@ -1,17 +1,21 @@
 TOOL	:=	riscv64-unknown-linux-gnu-
-AS		:=	$(TOOL)as
+CC		:=	$(TOOL)gcc
 OBJCOPY	:=	$(TOOL)objcopy
+OBJDUMP :=  $(TOOL)objdump
 
 .PHONY: clean
 
 start.hex: start.bin
 	od -t x4 -An -w4 -v $< > $@
 
-start.bin: start.out
+start.bin: start.elf
 	$(OBJCOPY) -O binary $< $@
 
-start.out: start.S
-	$(AS) $< -o $@
+start.elf: start.S main.c linker.ld
+	$(CC) -nostdlib -static -fno-builtin-printf -T linker.ld start.S main.c -o $@
+
+dump.S: start.elf
+	$(OBJDUMP) -D $< > $@
 
 clean:
-	rm start.hex start.bin start.out
+	rm start.hex start.bin start.elf
