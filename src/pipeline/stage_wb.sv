@@ -21,4 +21,11 @@ assign wb_out.result= wb_result;
 
 assign wb_exe_fw.result = wb_result;
 
+always_ff @(posedge clk) begin
+    assert (!wb_ctrl.reversed) else begin
+        $display("error");
+        $stop;
+    end
+end
+
 endmodule

@@ -66,7 +66,7 @@ always_ff @(posedge clk) begin
         end
         if (tmp_rs2_valid) begin
             reserve_rs2_flag <= 1;
-            reserve_rs2      <= tmp_rs1;
+            reserve_rs2      <= tmp_rs2;
         end
     end
 end

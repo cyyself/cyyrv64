@@ -15,6 +15,58 @@ void print_s(const char *c) {
     }
 }
 
+unsigned long __mulu10(unsigned long n)
+{
+  return (n<<3)+(n<<1);
+}
+
+/* __divu* routines are from the book, Hacker's Delight */
+
+unsigned long __divu10(unsigned long n) {
+  unsigned long q, r;
+  q = (n >> 1) + (n >> 2);
+  q = q + (q >> 4);
+  q = q + (q >> 8);
+  q = q + (q >> 16);
+  q = q >> 3;
+  r = n - __mulu10(q);
+  return q + ((r + 6) >> 4);
+}
+
+void print_long(long x) {
+    char buffer[30];
+    if (x < 0) {
+        uart_put_c('-');
+        x = -x;
+    }
+    int idx = 0;
+    while (x) {
+        long new_x = __divu10(x);
+        long rem_x = x - __mulu10(new_x);
+        buffer[idx ++] = '0' + rem_x;
+        x = new_x;
+    }
+    if (idx == 0) uart_put_c('0');
+    else while (idx) uart_put_c(buffer[--idx]);
+}
+
+void print_digit(unsigned char x) {
+    uart_put_c('0'+x);
+}
+
+void dump_hex(unsigned long x) {
+    uart_put_c('0');
+    uart_put_c('x');
+    char buffer[16];
+    for (int i=0;i<16;i++) {
+        unsigned long cur = x & 0xf;
+        buffer[i] = cur < 10 ? ('0' + cur) : ('a' + cur - 10);
+        x >>= 4;
+    }
+    for (int i=15;i>=0;i--) uart_put_c(buffer[i]);
+    uart_put_c('\n');
+}
+
 int cmain() {
     *((volatile char*)UART_BASE + UART_TX) = 'b';
     *((volatile char*)UART_BASE + UART_TX) = 'o';
@@ -40,5 +92,7 @@ int cmain() {
     s[12]= '\n';
     s[13]= 0;
     print_s(s);
+    print_long(114514);
+    uart_put_c('\n');
     return 0;
 }
