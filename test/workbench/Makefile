@@ -23,4 +23,4 @@ dump.S: start.elf
 	$(OBJDUMP) -D $< > $@
 
 clean:
-	rm start.hex start.bin start.elf
+	rm start_inst.hex start_data.hex start.bin start.elf
