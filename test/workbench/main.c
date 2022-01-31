@@ -68,31 +68,11 @@ void dump_hex(unsigned long x) {
 }
 
 int cmain() {
-    *((volatile char*)UART_BASE + UART_TX) = 'b';
-    *((volatile char*)UART_BASE + UART_TX) = 'o';
-    *((volatile char*)UART_BASE + UART_TX) = 'o';
-    *((volatile char*)UART_BASE + UART_TX) = 't';
-    *((volatile char*)UART_BASE + UART_TX) = 'i';
-    *((volatile char*)UART_BASE + UART_TX) = 'n';
-    *((volatile char*)UART_BASE + UART_TX) = 'g';
-    *((volatile char*)UART_BASE + UART_TX) = '\n';
-    char s[20];
-    s[0] = 'H';
-    s[1] = 'e';
-    s[2] = 'l';
-    s[3] = 'l';
-    s[4] = 'o';
-    s[5] = ' ';
-    s[6] = 'w';
-    s[7] = 'o';
-    s[8] = 'r';
-    s[9] = 'l';
-    s[10]= 'd';
-    s[11]= '!';
-    s[12]= '\n';
-    s[13]= 0;
-    print_s(s);
-    print_long(114514);
-    uart_put_c('\n');
+    print_s("cyyrv64 is booting...\n");
+    print_s("              vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n                  vvvvvvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrr       vvvvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrr      vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrr      vvvvvvvvvvvvvvvvvvvvvv  \nrrrrrrrrrrrrr       vvvvvvvvvvvvvvvvvvvvvv    \nrr                vvvvvvvvvvvvvvvvvvvvvv      \nrr            vvvvvvvvvvvvvvvvvvvvvvvv      rr\nrrrr      vvvvvvvvvvvvvvvvvvvvvvvvvv      rrrr\nrrrrrr      vvvvvvvvvvvvvvvvvvvvvv      rrrrrr\nrrrrrrrr      vvvvvvvvvvvvvvvvvv      rrrrrrrr\nrrrrrrrrrr      vvvvvvvvvvvvvv      rrrrrrrrrr\nrrrrrrrrrrrr      vvvvvvvvvv      rrrrrrrrrrrr\nrrrrrrrrrrrrrr      vvvvvv      rrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrr      vv      rrrrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrrrr          rrrrrrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrrrrrr      rrrrrrrrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrrrrrrrr  rrrrrrrrrrrrrrrrrrrrrr\n\n       INSTRUCTION SETS WANT TO BE FREE\n");
+    int year = 2022;
+    print_s("Year = ");
+    print_long(year);
+    print_s("\nHappy Lunar New Year!\n");
     return 0;
 }

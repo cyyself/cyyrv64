@@ -5,10 +5,13 @@ OBJDUMP :=  $(TOOL)objdump
 
 .PHONY: clean
 
-all: start.hex dump.S
+all: start_inst.hex start_data.hex dump.S
 
-start.hex: start.bin
+start_inst.hex: start.bin
 	od -t x4 -An -w4 -v $< > $@
+
+start_data.hex: start.bin
+	od -t x8 -An -w8 -v $< > $@
 
 start.bin: start.elf
 	$(OBJCOPY) -O binary $< $@

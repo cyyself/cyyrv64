@@ -40,8 +40,8 @@ pipeline pipeline(
 
 sram #(
     .LEN_ADDR(64),
-    .DEPTH(1024),
-    .INIT_FILE("start.hex")
+    .DEPTH(4096),
+    .INIT_FILE("start_inst.hex")
 ) inst_sram (
     .addra  (inst_addra),
     .clka   (clk),
@@ -79,7 +79,8 @@ sram_xbar #(
 sram #(
     .LEN_ADDR(64),
     .LEN_DATA(64),
-    .DEPTH(1024)
+    .DEPTH(2048),
+    .INIT_FILE("start_data.hex")
 ) data_sram (
     .addra  (mem_addra),
     .clka   (clk),
