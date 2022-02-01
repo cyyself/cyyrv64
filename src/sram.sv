@@ -29,9 +29,9 @@ initial begin
     if (INIT_FILE != "") $readmemh(INIT_FILE, ram);
 end
 
-logic [$clog2(DEPTH)-1:0]   line_addr_locked;
-logic [LEN_DATA-1:0]        write_mask_locked;
-logic [LEN_DATA-1:0]        dina_locked;
+logic [$clog2(DEPTH)-1:0]   line_addr_locked    = 0;
+logic [LEN_DATA-1:0]        write_mask_locked   = 0;
+logic [LEN_DATA-1:0]        dina_locked         = 0;
 
 always_ff @(posedge clka) begin // read
     if (ena) begin

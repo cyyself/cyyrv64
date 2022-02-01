@@ -1,8 +1,10 @@
+
 #define UART_BASE 0x60000000
 #define UART_RX		0	/* In:  Receive buffer */
 #define UART_TX		0	/* Out: Transmit buffer */
 #define UART_LSR	5	/* In:  Line Status Register */
 #define UART_LSR_TEMT		0x40 /* Transmitter empty */
+/*
 void uart_put_c(char c) {
     while (!(*((char*)UART_BASE + UART_LSR) & (UART_LSR_TEMT)));
     *((volatile char*)UART_BASE + UART_TX) = c;
@@ -19,9 +21,9 @@ unsigned long __mulu10(unsigned long n)
 {
   return (n<<3)+(n<<1);
 }
-
+*/
 /* __divu* routines are from the book, Hacker's Delight */
-
+/*
 unsigned long __divu10(unsigned long n) {
   unsigned long q, r;
   q = (n >> 1) + (n >> 2);
@@ -66,13 +68,37 @@ void dump_hex(unsigned long x) {
     for (int i=15;i>=0;i--) uart_put_c(buffer[i]);
     uart_put_c('\n');
 }
+*/
+
+#define BIO_BASE    0x64000000
+#define BIO_SEG7    0
+#define BIO_LED16   4
+#define BIO_SW      16
+
+unsigned short bio_sw_get() {
+    return *(volatile unsigned short*)((void*)BIO_BASE + BIO_SW);
+}
+
+void bio_led16_set(unsigned short value) {
+    *(volatile unsigned short*)((void*)BIO_BASE + BIO_LED16) = value;
+}
+
+void bio_seg7_set(unsigned int value) {
+    *(volatile unsigned int*)((void*)BIO_BASE + BIO_SEG7) = value;
+}
 
 int cmain() {
+    bio_seg7_set(0xdeadbeefu);
+    while (1) {
+        bio_led16_set(bio_sw_get());
+    }
+    /*
     print_s("cyyrv64 is booting...\n");
     print_s("              vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n                  vvvvvvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrr       vvvvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrr      vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrr      vvvvvvvvvvvvvvvvvvvvvv  \nrrrrrrrrrrrrr       vvvvvvvvvvvvvvvvvvvvvv    \nrr                vvvvvvvvvvvvvvvvvvvvvv      \nrr            vvvvvvvvvvvvvvvvvvvvvvvv      rr\nrrrr      vvvvvvvvvvvvvvvvvvvvvvvvvv      rrrr\nrrrrrr      vvvvvvvvvvvvvvvvvvvvvv      rrrrrr\nrrrrrrrr      vvvvvvvvvvvvvvvvvv      rrrrrrrr\nrrrrrrrrrr      vvvvvvvvvvvvvv      rrrrrrrrrr\nrrrrrrrrrrrr      vvvvvvvvvv      rrrrrrrrrrrr\nrrrrrrrrrrrrrr      vvvvvv      rrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrr      vv      rrrrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrrrr          rrrrrrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrrrrrr      rrrrrrrrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrrrrrrrr  rrrrrrrrrrrrrrrrrrrrrr\n\n       INSTRUCTION SETS WANT TO BE FREE\n");
     int year = 2022;
     print_s("Year = ");
     print_long(year);
     print_s("\nHappy Lunar New Year!\n");
+    */
     return 0;
 }
