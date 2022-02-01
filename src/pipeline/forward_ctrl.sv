@@ -61,12 +61,12 @@ always_ff @(posedge clk) begin
     end
     else begin // !exe_ready means some module in exe stage didn't finished or forward data didn't fetched
         if (tmp_rs1_valid) begin
-            reserve_rs1_flag <= 1;
-            reserve_rs1      <= tmp_rs1;
+            reserve_rs1_flag <= rs1_mem || rs1_wb;
+            reserve_rs1      <= rs1_mem ? mem_result : wb_result;
         end
         if (tmp_rs2_valid) begin
-            reserve_rs2_flag <= 1;
-            reserve_rs2      <= tmp_rs2;
+            reserve_rs2_flag <= rs2_mem || rs2_wb;
+            reserve_rs2      <= rs2_mem ? mem_result : wb_result;
         end
     end
 end
