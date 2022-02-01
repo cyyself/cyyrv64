@@ -19,7 +19,7 @@ pipe_flush_s    pipe_flush;
 
 // forward signal
 exe_data_fw exe_data;
-exe2if_fw   exe_if_fw;
+mem2if_fw   mem_if_fw;
 mem2exe_fw  mem_exe_fw;
 wb2exe_fw   wb_exe_fw;
 wb_reg      wb_id_fw;
@@ -104,7 +104,7 @@ stage_if stage_if(
     .if_stall   (pipe_stall.IF),
     .if_flush   (pipe_flush.IF),
     .if_ready   (pipe_ready.IF),
-    .exe_if_fw  (exe_if_fw),
+    .mem_if_fw  (mem_if_fw),
     .if_out     (if_pipe),
     .inst_addra (inst_addra),
     .inst_douta (inst_douta),
@@ -132,7 +132,6 @@ stage_exe stage_exe(
     .exe_data   (exe_data),
     .exe_in     (id2exe_exe),
     .exe_out    (exe2mem_exe),
-    .exe_if     (exe_if_fw),
     .exe_mem_fw (exe_mem_fw)
 );
 
@@ -147,6 +146,7 @@ stage_mem stage_mem(
     .mem_out    (mem2wb_mem),
     .exe_mem_fw (exe_mem_fw),
     .mem_exe_fw (mem_exe_fw),
+    .mem_if_fw  (mem_if_fw),
     .data_addra (data_addra),
     .data_dina  (data_dina),
     .data_douta (data_douta),
@@ -167,12 +167,12 @@ stage_wb stage_wb(
 );
 
 // pipeline controller
-wire ctrl_trans_flush = exe_if_fw.exe_pc_src;
+wire ctrl_trans_flush = mem_if_fw.mem_pc_src;
 
 assign pipe_flush.IF    = 1'b0;
 assign pipe_flush.ID    = (pipe_stall.IF && !pipe_stall.ID ) || ctrl_trans_flush;
 assign pipe_flush.EXE   = (pipe_stall.ID && !pipe_stall.EXE) || ctrl_trans_flush;
-assign pipe_flush.MEM   = (pipe_stall.EXE && !pipe_stall.MEM);
+assign pipe_flush.MEM   = (pipe_stall.EXE && !pipe_stall.MEM)|| ctrl_trans_flush;
 assign pipe_flush.WB    = (pipe_stall.MEM && !pipe_stall.WB);
 
 assign pipe_stall.WB    = !pipe_ready.WB;

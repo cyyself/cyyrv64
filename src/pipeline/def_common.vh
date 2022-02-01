@@ -61,8 +61,14 @@ typedef struct packed {
 } id2exe;
 
 typedef struct packed {
+    logic           mem_pc_src;
+    logic [63:0]    mem_new_pc;
+} mem2if_fw;
+
+typedef struct packed {
     logic [63:0]    alu_out;
     logic [63:0]    memaddr;
+    mem2if_fw       branch; 
 } exe2mem;
 
 typedef struct packed {
@@ -80,11 +86,6 @@ typedef struct packed {
 typedef struct packed {
     logic [63:0]    result;
 } wb2exe_fw;
-
-typedef struct packed {
-    logic           exe_pc_src;
-    logic [63:0]    exe_new_pc;
-} exe2if_fw;
 
 typedef struct packed {
     logic [63:0]    readdata;

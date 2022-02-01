@@ -9,7 +9,6 @@ module stage_exe(
     input  exe_data_fw  exe_data,
     input  id2exe       exe_in,
     output exe2mem      exe_out,
-    output exe2if_fw    exe_if,
     output exe2mem_fw   exe_mem_fw
 );
 
@@ -26,7 +25,7 @@ assign exe_mem_fw.funct3    = exe_pipe.instr[`FUNCT3_IDX];
 assign exe_mem_fw.memaddr   = exe_data.rs1  + exe_in.imm;
 assign exe_out.memaddr      = exe_data.rs1  + exe_in.imm;
 // bypass alu to i_cache to get better timing
-assign exe_if.exe_new_pc    = 
+assign exe_out.branch.mem_new_pc    = 
     exe_ctrl.branch ? (exe_pipe.pc + exe_in.imm) : 
     exe_ctrl.jalr   ? (exe_data.rs1 + exe_in.imm) :
                       (exe_pipe.pc + exe_in.imm);
@@ -48,6 +47,6 @@ blu blu(
     .taken  (branch_taken)
 );
 
-assign exe_if.exe_pc_src = ( (exe_ctrl.branch && branch_taken) || exe_ctrl.jump) && exe_data.valid;
+assign exe_out.branch.mem_pc_src = ( (exe_ctrl.branch && branch_taken) || exe_ctrl.jump) && exe_data.valid;
 
 endmodule

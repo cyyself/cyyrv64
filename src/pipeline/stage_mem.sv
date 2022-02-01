@@ -11,6 +11,7 @@ module stage_mem(
     output mem2wb       mem_out,
     input  exe2mem_fw   exe_mem_fw,
     output mem2exe_fw   mem_exe_fw,
+    output mem2if_fw    mem_if_fw,
     output [63:0]       data_addra,
     output [63:0]       data_dina,
     input  [63:0]       data_douta,
@@ -19,8 +20,8 @@ module stage_mem(
 );
 
 assign mem_out.result   = mem_ctrl.jump ? (mem_pipe.pc + 4) : mem_in.alu_out;
-assign mem_exe_fw.result = mem_out.result;
-
+assign mem_exe_fw.result= mem_out.result;
+assign mem_if_fw        = mem_in.branch;
 
 sram64_trans sram64_trans(
     .funct3_read    (mem_pipe.instr[`FUNCT3_IDX]),
