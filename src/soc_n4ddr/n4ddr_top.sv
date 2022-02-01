@@ -14,7 +14,7 @@ module n4ddr_top(
 );
 
 
-seg7 seg7(
+seg7_phy seg7(
     .clk    (CLK100MHZ),
     .data   (32'hdeadbeef),
     .AN     (AN),

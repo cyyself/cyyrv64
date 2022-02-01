@@ -1,6 +1,6 @@
-module seg7 #(
+module seg7_phy #(
     parameter nr_digit = 8,
-    parameter nr_clk = 10
+    parameter nr_clk = 12
 ) (
     input                   clk,
     input  [4*nr_digit-1:0] data,
