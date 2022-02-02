@@ -1,4 +1,5 @@
 #define TEST_BOARD_IO
+#define TEST_UART
 
 #ifdef  TEST_UART
 #define UART_BASE 0x60000000
@@ -94,13 +95,6 @@ void bio_seg7_set(unsigned int value) {
 #endif
 
 int cmain() {
-#ifdef TEST_BOARD_IO
-    bio_seg7_set(0xdeadbeefu);
-    while (1) {
-        bio_led16_set(bio_sw_get());
-    }
-#endif
-
 #ifdef TEST_UART
     print_s("cyyrv64 is booting...\n");
     print_s("              vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n                  vvvvvvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrr       vvvvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrr      vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrr      vvvvvvvvvvvvvvvvvvvvvv  \nrrrrrrrrrrrrr       vvvvvvvvvvvvvvvvvvvvvv    \nrr                vvvvvvvvvvvvvvvvvvvvvv      \nrr            vvvvvvvvvvvvvvvvvvvvvvvv      rr\nrrrr      vvvvvvvvvvvvvvvvvvvvvvvvvv      rrrr\nrrrrrr      vvvvvvvvvvvvvvvvvvvvvv      rrrrrr\nrrrrrrrr      vvvvvvvvvvvvvvvvvv      rrrrrrrr\nrrrrrrrrrr      vvvvvvvvvvvvvv      rrrrrrrrrr\nrrrrrrrrrrrr      vvvvvvvvvv      rrrrrrrrrrrr\nrrrrrrrrrrrrrr      vvvvvv      rrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrr      vv      rrrrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrrrr          rrrrrrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrrrrrr      rrrrrrrrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrrrrrrrr  rrrrrrrrrrrrrrrrrrrrrr\n\n       INSTRUCTION SETS WANT TO BE FREE\n");
@@ -108,6 +102,13 @@ int cmain() {
     print_s("Year = ");
     print_long(year);
     print_s("\nHappy Lunar New Year!\n");
+#endif
+
+#ifdef TEST_BOARD_IO
+    bio_seg7_set(0xdeadbeefu);
+    while (1) {
+        bio_led16_set(bio_sw_get());
+    }
 #endif
     return 0;
 }

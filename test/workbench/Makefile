@@ -17,7 +17,7 @@ start.bin: start.elf
 	$(OBJCOPY) -O binary $< $@
 
 start.elf: start.S main.c linker.ld
-	$(CC) -nostdlib -static -fno-builtin-printf -T linker.ld start.S main.c -o $@
+	$(CC) -nostdlib -static -fno-builtin-printf -T linker.ld start.S main.c -O3 -o $@
 
 dump.S: start.elf
 	$(OBJDUMP) -D $< > $@
