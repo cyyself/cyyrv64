@@ -17,6 +17,8 @@ module board_io_sram64 #(
     input  [4:0]    DIR_BTN
 );
 
+// write first, generate address interface with 64 bits
+
 logic [63:0] out_line [1:0];
 logic [63:0] in_line;
 
