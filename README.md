@@ -2,7 +2,7 @@
 
 A simple implementation of RISC-V CPU.
 
-Maybe renamed in the future.
+Maybe rename in the future.
 
 # Progress
 
