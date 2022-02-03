@@ -96,12 +96,12 @@ void bio_seg7_set(unsigned int value) {
 
 int cmain() {
 #ifdef TEST_UART
-    print_s("cyyrv64 is booting...\n");
-    print_s("              vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n                  vvvvvvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrr       vvvvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrr      vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\nrrrrrrrrrrrrrrrr      vvvvvvvvvvvvvvvvvvvvvv  \nrrrrrrrrrrrrr       vvvvvvvvvvvvvvvvvvvvvv    \nrr                vvvvvvvvvvvvvvvvvvvvvv      \nrr            vvvvvvvvvvvvvvvvvvvvvvvv      rr\nrrrr      vvvvvvvvvvvvvvvvvvvvvvvvvv      rrrr\nrrrrrr      vvvvvvvvvvvvvvvvvvvvvv      rrrrrr\nrrrrrrrr      vvvvvvvvvvvvvvvvvv      rrrrrrrr\nrrrrrrrrrr      vvvvvvvvvvvvvv      rrrrrrrrrr\nrrrrrrrrrrrr      vvvvvvvvvv      rrrrrrrrrrrr\nrrrrrrrrrrrrrr      vvvvvv      rrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrr      vv      rrrrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrrrr          rrrrrrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrrrrrr      rrrrrrrrrrrrrrrrrrrr\nrrrrrrrrrrrrrrrrrrrrrr  rrrrrrrrrrrrrrrrrrrrrr\n\n       INSTRUCTION SETS WANT TO BE FREE\n");
+    print_s("cyyrv64 is booting...\r\n");
+    print_s("              vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\r\n                  vvvvvvvvvvvvvvvvvvvvvvvvvvvv\r\nrrrrrrrrrrrrr       vvvvvvvvvvvvvvvvvvvvvvvvvv\r\nrrrrrrrrrrrrrrrr      vvvvvvvvvvvvvvvvvvvvvvvv\r\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\r\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\r\nrrrrrrrrrrrrrrrrrr    vvvvvvvvvvvvvvvvvvvvvvvv\r\nrrrrrrrrrrrrrrrr      vvvvvvvvvvvvvvvvvvvvvv  \r\nrrrrrrrrrrrrr       vvvvvvvvvvvvvvvvvvvvvv    \r\nrr                vvvvvvvvvvvvvvvvvvvvvv      \r\nrr            vvvvvvvvvvvvvvvvvvvvvvvv      rr\r\nrrrr      vvvvvvvvvvvvvvvvvvvvvvvvvv      rrrr\r\nrrrrrr      vvvvvvvvvvvvvvvvvvvvvv      rrrrrr\r\nrrrrrrrr      vvvvvvvvvvvvvvvvvv      rrrrrrrr\r\nrrrrrrrrrr      vvvvvvvvvvvvvv      rrrrrrrrrr\r\nrrrrrrrrrrrr      vvvvvvvvvv      rrrrrrrrrrrr\r\nrrrrrrrrrrrrrr      vvvvvv      rrrrrrrrrrrrrr\r\nrrrrrrrrrrrrrrrr      vv      rrrrrrrrrrrrrrrr\r\nrrrrrrrrrrrrrrrrrr          rrrrrrrrrrrrrrrrrr\r\nrrrrrrrrrrrrrrrrrrrr      rrrrrrrrrrrrrrrrrrrr\r\nrrrrrrrrrrrrrrrrrrrrrr  rrrrrrrrrrrrrrrrrrrrrr\r\n\r\n       INSTRUCTION SETS WANT TO BE FREE\r\n");
     int year = 2022;
     print_s("Year = ");
     print_long(year);
-    print_s("\nHappy Lunar New Year!\n");
+    print_s("\r\nHappy Lunar New Year!\r\n");
 #endif
 
 #ifdef TEST_BOARD_IO

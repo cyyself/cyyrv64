@@ -62,13 +62,23 @@ wire [63:0] mem_douta;
 wire        mem_ena;
 wire [7:0]  mem_wea;
 
+wire [63:0] dev_addra;
+wire [63:0] dev_dina;
+wire [63:0] dev_douta;
+wire        dev_ena;
+wire [7:0]  dev_wea;
+
+wire [63:0] uart_addra;
+wire [63:0] uart_dina;
+wire [63:0] uart_douta;
+wire        uart_ena;
+wire [7:0]  uart_wea;
+
 wire [63:0] bio_addra;
 wire [63:0] bio_dina;
 wire [63:0] bio_douta;
 wire        bio_ena;
 wire [7:0]  bio_wea;
-
-wire slave_mux_in = data_addra[31:28] == 4'h6;
 
 board_io_sram64 board_io(
     // sram interface
@@ -82,7 +92,7 @@ board_io_sram64 board_io(
     .rst        (rst),
     .seg7_data  (seg7_data),
     .LED        (LED),
-    .STATUS_LED ({LED17_b,LED17_G,LED17_R,LED16_b,LED16_G,LED16_R}),
+    .STATUS_LED ({LED17_B,LED17_G,LED17_R,LED16_B,LED16_G,LED16_R}),
     .SW         (SW),
     .DIR_BTN    ({BTNC,BTNL,BTND,BTNR,BTNU})
 );
@@ -128,12 +138,14 @@ sram #(
     .wea    (mem_wea)
 );
 
+wire mem_dev_sel = data_addra[31:28] == 4'h6;
+
 sram_xbar #(
     .LEN_ADDR(64),
     .LEN_DATA(64)
-) sram_xbar (
+) xbar_mem_device (
     .clk            (clk),
-    .slave_mux_in   (slave_mux_in),
+    .slave_mux_in   (mem_dev_sel),
     .master_addra   (data_addra),
     .master_dina    (data_dina),
     .master_douta   (data_douta),
@@ -144,6 +156,31 @@ sram_xbar #(
     .slave0_douta   (mem_douta),
     .slave0_ena     (mem_ena),
     .slave0_wea     (mem_wea),
+    .slave1_addra   (dev_addra),
+    .slave1_dina    (dev_dina),
+    .slave1_douta   (dev_douta),
+    .slave1_ena     (dev_ena),
+    .slave1_wea     (dev_wea)
+);
+
+wire uart_bio_sel = dev_addra[27:24] == 4'h4;
+
+sram_xbar #(
+    .LEN_ADDR(64),
+    .LEN_DATA(64)
+) xbar_uart_bio (
+    .clk            (clk),
+    .slave_mux_in   (uart_bio_sel),
+    .master_addra   (dev_addra),
+    .master_dina    (dev_dina),
+    .master_douta   (dev_douta),
+    .master_ena     (dev_ena),
+    .master_wea     (dev_wea),
+    .slave0_addra   (uart_addra),
+    .slave0_dina    (uart_dina),
+    .slave0_douta   (uart_douta),
+    .slave0_ena     (uart_ena),
+    .slave0_wea     (uart_wea),
     .slave1_addra   (bio_addra),
     .slave1_dina    (bio_dina),
     .slave1_douta   (bio_douta),
@@ -165,17 +202,35 @@ pipeline pipeline(
     .data_wea   (data_wea)
 );
 
-(*mark_debug = "true"*) wire [7:0] uart_rx_data;
-(*mark_debug = "true"*) wire       uart_rx_ready;
-(*mark_debug = "true"*) wire       uart_tx_ready;
 
-uart_phy uart (
+
+wire  [7:0] uart_tx_data;
+wire        uart_tx_valid;
+wire        uart_tx_ready;
+wire  [7:0] uart_rx_data;
+wire        uart_rx_ready;
+
+uart_phy #(.clk_hz(100000000)) uart_phy (
     .clk        (clk),
     .rst        (rst),
     .UART_TX    (UART_RXD_OUT),
     .UART_RX    (UART_TXD_IN),
-    .tx_data    (8'd102),
-    .tx_valid   (1'b1),
+    .tx_data    (uart_tx_data),
+    .tx_valid   (uart_tx_valid),
+    .tx_ready   (uart_tx_ready),
+    .rx_data    (uart_rx_data),
+    .rx_ready   (uart_rx_ready)
+);
+
+sram_uart_lite uart(
+    .addra      (uart_addra),
+    .clka       (clk),
+    .dina       (uart_dina),
+    .douta      (uart_douta),
+    .ena        (uart_ena),
+    .wea        (uart_wea),
+    .tx_data    (uart_tx_data),
+    .tx_valid   (uart_tx_valid),
     .tx_ready   (uart_tx_ready),
     .rx_data    (uart_rx_data),
     .rx_ready   (uart_rx_ready)
