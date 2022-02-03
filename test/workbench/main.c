@@ -9,7 +9,7 @@
 #define UART_LSR_TEMT		0x40 /* Transmitter empty */
 
 void uart_put_c(char c) {
-    while (!(*((char*)UART_BASE + UART_LSR) & (UART_LSR_TEMT)));
+    while (!(*((volatile char*)UART_BASE + UART_LSR) & (UART_LSR_TEMT)));
     *((volatile char*)UART_BASE + UART_TX) = c;
 }
 
