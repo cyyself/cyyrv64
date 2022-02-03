@@ -91,11 +91,16 @@ sram #(
 );
 
 sram_uart_lite uart(
-    .addra  (uart_addra),
-    .clka   (clk),
-    .dina   (uart_dina),
-    .douta  (uart_douta),
-    .ena    (uart_ena),
-    .wea    (uart_wea)
+    .addra      (uart_addra),
+    .clka       (clk),
+    .dina       (uart_dina),
+    .douta      (uart_douta),
+    .ena        (uart_ena),
+    .wea        (uart_wea),
+    .tx_data    (),
+    .tx_valid   (),
+    .tx_ready   (1'b1),
+    .rx_data    (0),
+    .rx_ready   (0)
 );
 endmodule
