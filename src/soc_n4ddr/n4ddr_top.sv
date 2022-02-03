@@ -26,7 +26,10 @@ module n4ddr_top(
     output          LED16_R,
     output          LED17_B,
     output          LED17_G,
-    output          LED17_R
+    output          LED17_R,
+    // UART
+    input           UART_TXD_IN,
+    output          UART_RXD_OUT
 );
 
 wire clk;
@@ -162,6 +165,20 @@ pipeline pipeline(
     .data_wea   (data_wea)
 );
 
+(*mark_debug = "true"*) wire [7:0] uart_rx_data;
+(*mark_debug = "true"*) wire       uart_rx_ready;
+(*mark_debug = "true"*) wire       uart_tx_ready;
 
+uart_phy uart (
+    .clk        (clk),
+    .rst        (rst),
+    .UART_TX    (UART_RXD_OUT),
+    .UART_RX    (UART_TXD_IN),
+    .tx_data    (8'd102),
+    .tx_valid   (1'b1),
+    .tx_ready   (uart_tx_ready),
+    .rx_data    (uart_rx_data),
+    .rx_ready   (uart_rx_ready)
+);
 
 endmodule
