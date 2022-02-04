@@ -51,8 +51,8 @@ always_ff @(posedge clka) begin
 end
 
 reg [7:0] fifo [FIFO_SIZE-1:0];
-reg [$clog2(FIFO_SIZE)-1:0] fifo_idx = 0;
-wire fifo_full  = {1'b0,fifo_idx} == FIFO_SIZE - 1;
+reg [FIFO_SIZE-1:0] fifo_idx = {{FIFO_SIZE-1{1'b0}},1'b1}; // one hot
+wire fifo_full  = fifo_idx[FIFO_SIZE-1];
 wire fifo_we    = rx_ready;
 wire fifo_read  = ena && !wea[0] && addra[2:0] == 3'd0;
 wire fifo_shift = fifo_read || (fifo_we && fifo_full);
@@ -66,17 +66,17 @@ genvar i;
 generate
     for (i=0;i<FIFO_SIZE-1;i++)
     always_ff @(posedge clka) begin
-        if (i == fifo_idx && fifo_we) fifo[i] <= rx_data;
+        if (fifo_we && fifo_idx[i]) fifo[i] <= rx_data;
         else if (fifo_shift) fifo[i] <= fifo[i+1];
     end
 endgenerate
 
 always_ff @(posedge clka) begin
     if (fifo_shift && !fifo_we) begin
-        if (|fifo_idx) fifo_idx  <= fifo_idx - 1;
+        if (!fifo_idx[0]) fifo_idx  <= {1'b0,fifo_idx[FIFO_SIZE-1:1]};
     end
     else if (fifo_we && !fifo_shift) begin
-        fifo_idx    <= fifo_idx + 1;
+        fifo_idx    <= {fifo_idx[FIFO_SIZE-2:0],1'b0};
     end
     if (ena) begin
         /*
@@ -85,7 +85,7 @@ always_ff @(posedge clka) begin
             UART_LSR_THRE: 0x20, Transmit-hold-register empty
             UART_LSR_DR  : 0x01, Receiver data ready
         */
-        douta <= {16'd0,{1'b0,tx_writeable,tx_writeable,4'd0,|fifo_idx},32'd0,fifo[0]};
+        douta <= {16'd0,{1'b0,tx_writeable,tx_writeable,4'd0,!fifo_idx[0]},32'd0,fifo[0]};
     end
 end
 

@@ -222,7 +222,7 @@ uart_phy #(.clk_hz(100000000)) uart_phy (
     .rx_ready   (uart_rx_ready)
 );
 
-sram_uart_lite #(.FIFO_SIZE(8)) uart(
+sram_uart_lite #(.FIFO_SIZE(64)) uart(
     .addra      (uart_addra),
     .clka       (clk),
     .dina       (uart_dina),
