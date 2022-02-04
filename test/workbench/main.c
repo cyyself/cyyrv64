@@ -122,8 +122,13 @@ int cmain() {
 #endif
 #ifdef TEST_UART
         if (uart_check_read()) {
-            print_long(uart_get_c());
-            print_s("\r\n");
+            char c = uart_get_c();
+            if (c == 0) print_s("error\r\n");
+            else if (c == '\r') {
+                uart_put_c(c);
+                uart_put_c('\n');
+            }
+            else uart_put_c(c);
         }
 #endif
     }
