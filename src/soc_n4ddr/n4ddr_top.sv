@@ -113,7 +113,7 @@ seg7_phy seg7(
 
 sram #(
     .LEN_ADDR(64),
-    .DEPTH(1024),
+    .DEPTH(8192),
     .INIT_FILE("start_inst.hex")
 ) inst_sram (
     .addra  (inst_addra),
@@ -127,7 +127,7 @@ sram #(
 sram #(
     .LEN_ADDR(64),
     .LEN_DATA(64),
-    .DEPTH(512),
+    .DEPTH(4096),
     .INIT_FILE("start_data.hex")
 ) data_sram (
     .addra  (mem_addra),
@@ -214,7 +214,7 @@ uart_phy #(.clk_hz(100000000)) uart_phy (
     .clk        (clk),
     .rst        (rst),
     .UART_TX    (UART_RXD_OUT),
-    .UART_RX    (UART_TXD_IN),
+    .UART_RX_i  (UART_TXD_IN),
     .tx_data    (uart_tx_data),
     .tx_valid   (uart_tx_valid),
     .tx_ready   (uart_tx_ready),

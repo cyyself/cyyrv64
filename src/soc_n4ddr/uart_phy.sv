@@ -6,13 +6,19 @@ module uart_phy #(
     input               clk,
     input               rst,
     output              UART_TX,
-    input               UART_RX,
+    input               UART_RX_i,
     input        [7:0]  tx_data,
     input               tx_valid,
     output              tx_ready,
     output logic [7:0]  rx_data,
     output logic        rx_ready
 );
+
+logic UART_RX;
+always_ff @(posedge clk ) begin
+    UART_RX <= UART_RX_i;
+end
+
 // uart 8n1
 
 if (clk_hz < baudrate * 64) $error("UART clock frequency too low or baud rate too high");
