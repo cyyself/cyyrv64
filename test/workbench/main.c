@@ -3,14 +3,24 @@
 
 #ifdef  TEST_UART
 #define UART_BASE 0x60000000
-#define UART_RX		0	/* In:  Receive buffer */
-#define UART_TX		0	/* Out: Transmit buffer */
-#define UART_LSR	5	/* In:  Line Status Register */
-#define UART_LSR_TEMT		0x40 /* Transmitter empty */
+#define UART_RX     0   /* In:  Receive buffer */
+#define UART_TX     0   /* Out: Transmit buffer */
+#define UART_LSR    5   /* In:  Line Status Register */
+#define UART_LSR_TEMT       0x40 /* Transmitter empty */
+#define UART_LSR_THRE       0x20 /* Transmit-hold-register empty */
+#define UART_LSR_DR         0x01 /* Receiver data ready */
 
 void uart_put_c(char c) {
     while (!(*((volatile char*)UART_BASE + UART_LSR) & (UART_LSR_TEMT)));
     *((volatile char*)UART_BASE + UART_TX) = c;
+}
+
+char uart_check_read() { // 1: data ready, 0: no data
+    return (*((volatile char*)UART_BASE + UART_LSR) & (UART_LSR_DR));
+}
+
+char uart_get_c() {
+    return (*((volatile char*)UART_BASE + UART_RX));
 }
 
 void print_s(const char *c) {
@@ -103,12 +113,19 @@ int cmain() {
     print_long(year);
     print_s("\r\nHappy Lunar New Year!\r\n");
 #endif
-
 #ifdef TEST_BOARD_IO
     bio_seg7_set(0xdeadbeefu);
-    while (1) {
-        bio_led16_set(bio_sw_get());
-    }
 #endif
+    while (1) {
+#ifdef TEST_BOARD_IO
+        bio_led16_set(bio_sw_get());
+#endif
+#ifdef TEST_UART
+        if (uart_check_read()) {
+            print_long(uart_get_c());
+            print_s("\r\n");
+        }
+#endif
+    }
     return 0;
 }

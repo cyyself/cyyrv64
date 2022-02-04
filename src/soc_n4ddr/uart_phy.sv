@@ -1,6 +1,7 @@
 module uart_phy #(
     parameter integer clk_hz    = 100000000,    // 100MHz
-    parameter integer baudrate  = 115200
+    parameter integer baudrate  = 115200,
+    parameter integer neg_wait  = 2
 ) (
     input               clk,
     input               rst,
@@ -56,11 +57,14 @@ end
 
 // rx {
 
-logic rx_res = 0;
+parameter integer rx_history_max = neg_wait*2-1-1;
+logic [rx_history_max:0] rx_history;
 always_ff @(posedge clk) begin
-    if (rst) rx_res <= 0;
-    else rx_res <= UART_RX;
+    if (rst) rx_history <= 0;
+    else rx_history <= {rx_history[rx_history_max-1:0],UART_RX};
 end
+wire uart_rx_neg = {rx_history,UART_RX} == {{neg_wait{1'b1}},{neg_wait{1'b0}}};
+
 logic uart_rx_busy = 0;
 logic [31:0] clk_cnt_rx = 0;
 always_ff @(posedge clk) begin
@@ -68,7 +72,6 @@ always_ff @(posedge clk) begin
     else clk_cnt_rx <= (clk_cnt_rx == clk_div) ? 0 : (clk_cnt_rx + 1);
 end
 
-wire uart_rx_neg = rx_res && !UART_RX;
 logic [9:0] rx_data_raw = 0;
 logic [3:0] rx_bit_idx;
 always_ff @(posedge clk) begin
@@ -84,11 +87,14 @@ always_ff @(posedge clk) begin
     end
     else if (clk_cnt_rx == clk_div_half) begin
         rx_data_raw[rx_bit_idx] <= UART_RX;
+        if (rx_bit_idx == 4'd9) begin
+            uart_rx_busy    <= 0;
+            rx_ready        <= !rx_data_raw[0] & UART_RX;
+        end
     end
     else if (clk_cnt_rx == clk_div) begin
         if (rx_bit_idx == 4'd9) begin
             uart_rx_busy    <= 0;
-            rx_ready        <= !rx_data_raw[0] & rx_data_raw[9];
         end
         else begin
             rx_bit_idx      <= rx_bit_idx + 1;
