@@ -15,9 +15,11 @@ module sram_uart_lite #(
     input               rx_ready
 );
 
+wire tx_writeable = !tx_valid & tx_ready;
+
 always_ff @(posedge clka) begin
     if (ena) begin
-        douta <= {16'd0,{1'b0,tx_ready,tx_ready,5'd0},40'd0}; // 5: UART_LSR_TEMT | UART_LSR_THRE
+        douta <= {16'd0,{1'b0,tx_writeable,tx_writeable,5'd0},40'd0}; // 5: UART_LSR_TEMT | UART_LSR_THRE
         if (wea[0]) begin
             tx_data     <= dina[7:0];
             tx_valid    <= 1;
