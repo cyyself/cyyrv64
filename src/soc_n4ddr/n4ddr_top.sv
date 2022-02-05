@@ -113,7 +113,7 @@ seg7_phy seg7(
 
 sram #(
     .LEN_ADDR(64),
-    .DEPTH(8192),
+    .DEPTH(4096),
     .INIT_FILE("start_inst.hex")
 ) inst_sram (
     .addra  (inst_addra),
@@ -127,7 +127,7 @@ sram #(
 sram #(
     .LEN_ADDR(64),
     .LEN_DATA(64),
-    .DEPTH(4096),
+    .DEPTH(2048),
     .INIT_FILE("start_data.hex")
 ) data_sram (
     .addra  (mem_addra),
