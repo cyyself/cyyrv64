@@ -30,24 +30,6 @@ void print_s(const char *c) {
     }
 }
 
-unsigned long __mulu10(unsigned long n)
-{
-  return (n<<3)+(n<<1);
-}
-
-/* __divu* routines are from the book, Hacker's Delight */
-
-unsigned long __divu10(unsigned long n) {
-  unsigned long q, r;
-  q = (n >> 1) + (n >> 2);
-  q = q + (q >> 4);
-  q = q + (q >> 8);
-  q = q + (q >> 16);
-  q = q >> 3;
-  r = n - __mulu10(q);
-  return q + ((r + 6) >> 4);
-}
-
 void print_long(long x) {
     char buffer[30];
     if (x < 0) {
@@ -56,8 +38,8 @@ void print_long(long x) {
     }
     int idx = 0;
     while (x) {
-        long new_x = __divu10(x);
-        long rem_x = x - __mulu10(new_x);
+        long new_x = x / 10;
+        long rem_x = x % 10;
         buffer[idx ++] = '0' + rem_x;
         x = new_x;
     }
@@ -79,6 +61,7 @@ void dump_hex(unsigned long x) {
         x >>= 4;
     }
     for (int i=15;i>=0;i--) uart_put_c(buffer[i]);
+    uart_put_c('\r');
     uart_put_c('\n');
 }
 
@@ -88,7 +71,10 @@ void dump_hex(unsigned long x) {
 #define BIO_BASE    0x64000000
 #define BIO_SEG7    0
 #define BIO_LED16   4
+#define BIO_LED     6
+#define BIO_CLOCK   8
 #define BIO_SW      16
+#define BIO_DIR_BTN 18
 
 unsigned short bio_sw_get() {
     return *(volatile unsigned short*)((void*)BIO_BASE + BIO_SW);
@@ -98,8 +84,20 @@ void bio_led16_set(unsigned short value) {
     *(volatile unsigned short*)((void*)BIO_BASE + BIO_LED16) = value;
 }
 
+void bio_led_set(unsigned short value) {
+    *(volatile unsigned short*)((void*)BIO_BASE + BIO_LED) = value;
+}
+
 void bio_seg7_set(unsigned int value) {
     *(volatile unsigned int*)((void*)BIO_BASE + BIO_SEG7) = value;
+}
+
+unsigned long bio_get_clock() {
+    return *(volatile unsigned long*)((void*)BIO_BASE + BIO_CLOCK);
+}
+
+unsigned short bio_dir_btn_get() {
+    return *(volatile unsigned short*)((void*)BIO_BASE + BIO_DIR_BTN);
 }
 
 #endif
@@ -112,13 +110,19 @@ int cmain() {
     print_s("Year = ");
     print_long(year);
     print_s("\r\nHappy Lunar New Year!\r\n");
-#endif
-#ifdef TEST_BOARD_IO
-    bio_seg7_set(0xdeadbeefu);
+    #ifdef TEST_BOARD_IO
+        unsigned long clk = bio_get_clock();
+        dump_hex(clk);
+        print_long(clk);
+        print_s("\r\n");
+    #endif
 #endif
     while (1) {
 #ifdef TEST_BOARD_IO
         bio_led16_set(bio_sw_get());
+        bio_led_set(bio_dir_btn_get());
+        unsigned long clock = bio_get_clock();
+        bio_seg7_set(0xf00ba000u^(clock >> 24));
 #endif
 #ifdef TEST_UART
         if (uart_check_read()) {
