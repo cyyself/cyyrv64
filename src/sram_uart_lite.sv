@@ -13,7 +13,8 @@ module sram_uart_lite #(
     output logic        tx_valid,
     input               tx_ready,
     input         [7:0] rx_data,
-    input               rx_ready
+    input               rx_valid,
+    output logic        rx_ready // if rx_valid is zero, rx data and ready signal should be stalled
 );
 /*
     Warning:
@@ -52,10 +53,10 @@ end
 
 reg [7:0] fifo [FIFO_SIZE-1:0];
 reg [FIFO_SIZE-1:0] fifo_idx = {{FIFO_SIZE-1{1'b0}},1'b1}; // one hot
-wire fifo_full  = fifo_idx[FIFO_SIZE-1];
-wire fifo_we    = rx_ready;
 wire fifo_read  = ena && !wea[0] && addra[2:0] == 3'd0;
-wire fifo_shift = fifo_read || (fifo_we && fifo_full);
+assign rx_ready = !fifo_read;
+wire fifo_we    = rx_valid && rx_ready;
+wire fifo_shift = fifo_read;
 
 integer j;
 initial begin
@@ -72,10 +73,10 @@ generate
 endgenerate
 
 always_ff @(posedge clka) begin
-    if (fifo_shift && !fifo_we) begin
+    if (fifo_shift) begin
         if (!fifo_idx[0]) fifo_idx  <= {1'b0,fifo_idx[FIFO_SIZE-1:1]};
     end
-    else if (fifo_we && !fifo_shift) begin
+    else if (fifo_we) begin
         fifo_idx    <= {fifo_idx[FIFO_SIZE-2:0],1'b0};
     end
     if (ena) begin

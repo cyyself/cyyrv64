@@ -11,7 +11,8 @@ module uart_phy #(
     input               tx_valid,
     output              tx_ready,
     output logic [7:0]  rx_data,
-    output logic        rx_ready
+    output logic        rx_valid,
+    input               rx_ready
 );
 
 logic UART_RX;
@@ -84,18 +85,20 @@ always_ff @(posedge clk) begin
     if (rst) begin
         uart_rx_busy    <= 0;
         rx_bit_idx      <= 0;
-        rx_ready        <= 0;
+        rx_valid        <= 0;
+        rx_data         <= 0;
     end
     else if (!uart_rx_busy && uart_rx_neg) begin
         uart_rx_busy    <= 1;
         rx_bit_idx      <= 0;
-        rx_ready        <= 0;
+        rx_valid        <= rx_ready ? 0 : rx_valid;
     end
     else if (clk_cnt_rx == clk_div_half) begin
         rx_data_raw[rx_bit_idx] <= UART_RX;
         if (rx_bit_idx == 4'd9) begin
             uart_rx_busy    <= 0;
-            rx_ready        <= !rx_data_raw[0] & UART_RX;
+            rx_valid        <= !rx_data_raw[0] & UART_RX;
+            rx_data         <= rx_data_raw[8:1];
         end
     end
     else if (clk_cnt_rx == clk_div) begin
@@ -107,11 +110,9 @@ always_ff @(posedge clk) begin
         end
     end
     else begin
-        rx_ready        <= 0;
+        rx_valid        <= rx_ready ? 0 : rx_valid;
     end
 end
-
-assign rx_data = rx_data_raw[8:1];
 
 // rx }
 

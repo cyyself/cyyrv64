@@ -208,6 +208,7 @@ wire  [7:0] uart_tx_data;
 wire        uart_tx_valid;
 wire        uart_tx_ready;
 wire  [7:0] uart_rx_data;
+wire        uart_rx_valid;
 wire        uart_rx_ready;
 
 uart_phy #(.clk_hz(100000000)) uart_phy (
@@ -219,10 +220,11 @@ uart_phy #(.clk_hz(100000000)) uart_phy (
     .tx_valid   (uart_tx_valid),
     .tx_ready   (uart_tx_ready),
     .rx_data    (uart_rx_data),
+    .rx_valid   (uart_rx_valid),
     .rx_ready   (uart_rx_ready)
 );
 
-sram_uart_lite #(.FIFO_SIZE(64)) uart(
+sram_uart_lite #(.FIFO_SIZE(8)) uart(
     .addra      (uart_addra),
     .clka       (clk),
     .dina       (uart_dina),
@@ -233,6 +235,7 @@ sram_uart_lite #(.FIFO_SIZE(64)) uart(
     .tx_valid   (uart_tx_valid),
     .tx_ready   (uart_tx_ready),
     .rx_data    (uart_rx_data),
+    .rx_valid   (uart_rx_valid),
     .rx_ready   (uart_rx_ready)
 );
 

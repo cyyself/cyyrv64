@@ -101,6 +101,7 @@ sram_uart_lite uart(
     .tx_valid   (),
     .tx_ready   (1'b1),
     .rx_data    (0),
-    .rx_ready   (0)
+    .rx_valid   (0),
+    .rx_ready   ()
 );
 endmodule
