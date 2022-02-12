@@ -1,3 +1,4 @@
+#include "verilated_vcd_c.h"
 #include "Vsim_soc_top.h"
 #include "verilated.h"
 #include "ncurses.h"
@@ -51,6 +52,17 @@ void do_uart(Vsim_soc_top &top, std::queue <char> &uart_buf) {
 }
 
 int main(int argc, char** argv, char** env) {
+    Verilated::commandArgs(argc, argv);
+    // trace_usage: obj_dir/Vsim_soc_top -trace 100000
+    bool trace_on = false;
+    unsigned long sim_time = 1e5;
+    for (int i=1;i<argc;i++) if (strcmp(argv[i],"-trace") == 0) {
+        trace_on = true;
+        if (i+1 < argc) {
+            sscanf(argv[i+1],"%lu",&sim_time);
+        }
+    }
+    Verilated::traceEverOn(true);
     initscr();
     scrollok(stdscr,TRUE);
     raw();      // disable line buffer
@@ -58,9 +70,14 @@ int main(int argc, char** argv, char** env) {
     timeout(0); // non blocking getch()
     printw("CPU is running. Press Ctrl+'A'-'K' or Ctrl+'C' to exit.\n");
     refresh();
-
     Vsim_soc_top top;
     int rst_timer = 100;
+    VerilatedVcdC vcd;
+    if (trace_on) {
+        top.trace(&vcd,0);
+        vcd.open("trace.vcd");
+    }
+
     top.clk = 0;
     top.rst = 1;
     top.uart_rx_data = 0;
@@ -68,8 +85,8 @@ int main(int argc, char** argv, char** env) {
     top.uart_tx_ready = 1;
 
     std::queue <char> uart_buf;
-
-    while (!Verilated::gotFinish()) {
+    unsigned long current_time = 0;
+    while (current_time < sim_time && !Verilated::gotFinish()) {
         top.eval();
         top.clk = !top.clk;
         if (rst_timer) {
@@ -79,9 +96,13 @@ int main(int argc, char** argv, char** env) {
             top.rst = 0;
             do_keyboard_input(uart_buf);
             do_uart(top,uart_buf);
+            if (trace_on) {
+                vcd.dump(current_time);
+                current_time ++;
+            }
         }
     }
-    
+    if (trace_on) vcd.close();
     top.final();
     endwin();
     return 0;
