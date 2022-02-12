@@ -1,6 +1,12 @@
-module cpu_top(
-    input   clk,
-    input   rst
+module sim_soc_top(
+    input       clk,
+    input       rst,
+    output[7:0] uart_tx_data,
+    output      uart_tx_valid,
+    input       uart_tx_ready,
+    input [7:0] uart_rx_data,
+    input       uart_rx_valid,
+    output      uart_rx_ready
 );
 
 wire [63:0] inst_addra;
@@ -97,11 +103,11 @@ sram_uart_lite uart(
     .douta      (uart_douta),
     .ena        (uart_ena),
     .wea        (uart_wea),
-    .tx_data    (),
-    .tx_valid   (),
-    .tx_ready   (1'b1),
-    .rx_data    (0),
-    .rx_valid   (0),
-    .rx_ready   ()
+    .tx_data    (uart_tx_data),
+    .tx_valid   (uart_tx_valid),
+    .tx_ready   (uart_tx_ready),
+    .rx_data    (uart_rx_data),
+    .rx_valid   (uart_rx_valid),
+    .rx_ready   (uart_rx_ready)
 );
 endmodule

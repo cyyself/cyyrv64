@@ -38,7 +38,6 @@ always_ff @(posedge clka) begin
         if (wea[0]) begin
             tx_data     <= dina[7:0];
             tx_valid    <= 1;
-            $write("%c",dina[7:0]);
         end
         else begin
             tx_data     <= 0;

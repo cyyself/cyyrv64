@@ -7,9 +7,15 @@ initial #100 rst = 0;
 
 always #5 clk = ~clk;
 
-cpu_top cpu_top(
-    .clk    (clk),
-    .rst    (rst)
+sim_soc_top soc_top(
+    .clk            (clk),
+    .rst            (rst),
+    .uart_tx_data   (),
+    .uart_tx_valid  (),
+    .uart_tx_ready  (1'b1),
+    .uart_rx_data   (0),
+    .uart_rx_valid  (0),
+    .uart_rx_ready  ()
 );
 
 endmodule
