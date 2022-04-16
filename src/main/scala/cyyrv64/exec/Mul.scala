@@ -10,7 +10,6 @@ class MulPort extends Bundle {
     val mulOp = Input(MulOpSel())
     val mode32 = Input(Bool())
     val out_valid = Output(Bool())
-    val out_ready = Input(Bool())
     val out = Output(SInt(64.W))
 }
 
@@ -82,9 +81,7 @@ class Mul extends Module {
                 var final_s = Mux(outsign,-(final_u.asSInt),final_u.asSInt)
                 out := Mux(out32, Mux(outhigh,final_s(63,32),final_s(32,0)) , Mux(outhigh,final_s(127,64),final_s(63,0)) ).asSInt
                 valid := true.B
-                when (io.out_ready) {
-                    state := sIDLE
-                }
+                state := sIDLE
             }
         }
     }.otherwise {

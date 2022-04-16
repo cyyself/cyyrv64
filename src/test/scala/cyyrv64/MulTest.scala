@@ -16,7 +16,6 @@ class MulTest extends AnyFlatSpec with ChiselScalatestTester {
                 mul.io.en.poke(true.B)
                 mul.io.mulOp.poke(op)
                 mul.io.mode32.poke(mode32)
-                mul.io.out_ready.poke(true.B)
                 mul.clock.step()
                 mul.io.out_valid.expect(false.B)
                 mul.clock.step()
@@ -33,6 +32,19 @@ class MulTest extends AnyFlatSpec with ChiselScalatestTester {
                 mul.io.out_valid.expect(false.B)
                 mul.clock.step()
                 mul.io.out_valid.expect(false.B)
+                mul.clock.step()
+                mul.io.out_valid.expect(false.B)
+                mul.clock.step()
+                mul.io.out_valid.expect(false.B)
+                mul.io.en.poke(true.B)
+                mul.clock.step()
+                mul.io.out_valid.expect(false.B)
+                mul.clock.step()
+                mul.io.out_valid.expect(false.B)
+                mul.clock.step()
+                mul.io.out_valid.expect(true.B)
+                mul.io.out.expect(out)
+                mul.io.en.poke(false.B)
             }
         }
     }
