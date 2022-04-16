@@ -21,8 +21,7 @@ class ALU extends Module {
 
     val shift = Mux(io.mode32,Cat("b0".U,io.in2(4,0)),io.in2(5,0))
 
-    val result = Wire(SInt(64.W))
-    result := 0.S // init with 0
+    val result = WireDefault(0.S(64.W))
 
     switch (io.aluOp) {
         is (ALUOpSel.add) {
