@@ -7,6 +7,10 @@ object ALUOpSel extends ChiselEnum {
     val nop, add, sub, sll, slt, sltu, xor, srl, sra, or, and = Value
 }
 
+object BranchOpSel extends ChiselEnum {
+    val nop, beq, bne, blt, bge, bltu, bgeu = Value
+}
+
 object MulOpSel extends ChiselEnum {
     val nop, mul, mulh, mulhu, mulhsu = Value
 }
