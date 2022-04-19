@@ -10,6 +10,7 @@ class MulPort extends Bundle {
     val mulOp = Input(MulOpSel())
     val mode32 = Input(Bool())
     val out_valid = Output(Bool())
+    val out_ready = Input(Bool())
     val out = Output(SInt(64.W))
 }
 
@@ -31,42 +32,44 @@ class Mul extends Module {
     io.out_valid := valid
     io.out := out
 
-    when(io.en) {
+    when (io.en) {
         switch (state) {
             is (sIDLE) {
-                val new_in1 = Mux(io.mode32,io.in1(31,0).asSInt,io.in1)
-                val new_in2 = Mux(io.mode32,io.in2(31,0).asSInt,io.in2)
-                val in1_sign = new_in1(63)
-                val in2_sign = new_in2(63)
-                switch (io.mulOp) {
-                    is (MulOpSel.mul) {
-                        outsign := false.B
-                        outhigh := false.B
-                        op1 := new_in1.asUInt
-                        op2 := new_in2.asUInt
+                when (!valid || io.out_ready) { // is not valid hold status. It equals to !(valid && !io.out_ready)
+                    val new_in1 = Mux(io.mode32,io.in1(31,0).asSInt,io.in1)
+                    val new_in2 = Mux(io.mode32,io.in2(31,0).asSInt,io.in2)
+                    val in1_sign = new_in1(63)
+                    val in2_sign = new_in2(63)
+                    switch (io.mulOp) {
+                        is (MulOpSel.mul) {
+                            outsign := false.B
+                            outhigh := false.B
+                            op1 := new_in1.asUInt
+                            op2 := new_in2.asUInt
+                        }
+                        is (MulOpSel.mulh) {
+                            outsign := in1_sign ^ in2_sign
+                            outhigh := true.B
+                            op1 := new_in1.abs.asUInt
+                            op2 := new_in2.abs.asUInt
+                        }
+                        is (MulOpSel.mulhu) {
+                            outsign := false.B
+                            outhigh := true.B
+                            op1 := new_in1.asUInt
+                            op2 := new_in2.asUInt
+                        }
+                        is (MulOpSel.mulhsu) {
+                            outsign := in1_sign
+                            outhigh := true.B
+                            op1 := new_in1.abs.asUInt
+                            op2 := new_in2.asUInt
+                        }
                     }
-                    is (MulOpSel.mulh) {
-                        outsign := in1_sign ^ in2_sign
-                        outhigh := true.B
-                        op1 := new_in1.abs.asUInt
-                        op2 := new_in2.abs.asUInt
-                    }
-                    is (MulOpSel.mulhu) {
-                        outsign := false.B
-                        outhigh := true.B
-                        op1 := new_in1.asUInt
-                        op2 := new_in2.asUInt
-                    }
-                    is (MulOpSel.mulhsu) {
-                        outsign := in1_sign
-                        outhigh := true.B
-                        op1 := new_in1.abs.asUInt
-                        op2 := new_in2.asUInt
-                    }
+                    out32 := io.mode32
+                    state := sCAL
+                    valid := false.B
                 }
-                out32 := io.mode32
-                state := sCAL
-                valid := false.B
             }
             is (sCAL) {
                 mid_result(0) := op1(31, 0) * op2(31, 0)
