@@ -18,7 +18,7 @@ object AxiDef {
     }
 }
 
-class AxiPort(val addrWidth: Int = 64, val dataWidth: Int = 64, val idWidth: Int = 4) extends Bundle {
+class AxiPort(val addrWidth: Int = 64, val idWidth: Int = 4, val dataWidth: Int = 64) extends Bundle {
     // aw channel
     val awid = Output(UInt(idWidth.W))
     val awaddr = Output(UInt(addrWidth.W))
