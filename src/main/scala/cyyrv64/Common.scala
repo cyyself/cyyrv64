@@ -128,3 +128,35 @@ object RVInstr {
         val AMOMAXU = "b11100".U
     }
 }
+
+object RVExcCode {
+    val instr_misalign  = 0.U 
+    val instr_acc_fault = 1.U 
+    val illegal_instr   = 2.U 
+    val breakpoint      = 3.U 
+    val load_misalign   = 4.U 
+    val load_acc_fault  = 5.U 
+    val store_misalign  = 6.U   // including amo
+    val store_acc_fault = 7.U   // including amo
+    val ecall_from_u    = 8.U 
+    val ecall_from_s    = 9.U 
+    val ecall_from_m    = 11.U 
+    val instr_pgfault   = 12.U 
+    val load_pgfault    = 13.U 
+    val store_pgfault   = 15.U  // including amo
+}
+
+object RVIntCode {
+    val s_sw    = 1.U
+    val m_sw    = 3.U
+    val s_timer = 5.U
+    val m_timer = 7.U
+    val s_ext   = 9.U
+    val m_ext   = 11.U
+}
+
+object RVPrivMode {
+    val User        = 0.U
+    val Supervisor  = 1.U
+    val Machine     = 3.U
+}
