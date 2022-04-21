@@ -2,6 +2,7 @@ package cyyrv64
 
 import chisel3._
 import chisel3.util._
+import chisel3.experimental.ChiselEnum
 
 // L1 to L2
 object L2ReqType extends ChiselEnum {
@@ -11,7 +12,7 @@ object L2ReqType extends ChiselEnum {
     read            -> acquire shared
     read_through    -> read from L2 but didn't acquire any status. e.g. I Cache and DMA read and MMIO read
     write_shared    -> release modified but keep shared
-    wirte_back      -> release modified and shared. (Also used for DMA device and MMIO request from core)
+    write_back      -> release modified and shared. (Also used for DMA device and MMIO request from core)
 
     Note: acq_modified is used for amo operations
  */
@@ -24,19 +25,19 @@ object COReqType extends ChiselEnum {
 class L2DataChannel extends Bundle {
     val reqType = Output(L2ReqType())
     val reqAddr = Output(UInt(64.W))
-    val reqSize = Output(UInt(6.W)) // Bytes - 1
+    val reqSize = Output(UInt(3.W)) // 2**reqSize = actual size
     val reqValid = Output(Bool())
     val reqReady = Input(Bool())
     val rData = Input(UInt(64.W))
     val wData = Output(UInt(64.W))
-    val wstrb = Output(8.W)
+    val wStrb = Output(UInt(8.W))
     val rValid = Input(Bool())
     val rReady = Output(Bool())
     val wValid = Output(Bool())
     val wReady = Input(Bool())
 }
 
-class L2ConherenceChannel extends Bundle {
+class L2CoherenceChannel extends Bundle {
     val reqType = Input(COReqType())
     val reqAddr = Input(UInt(64.W))
     val reqValid = Input(Bool())
