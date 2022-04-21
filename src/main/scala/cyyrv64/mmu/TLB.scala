@@ -55,6 +55,7 @@ class TLBEntry extends Bundle {
             R := pte(1)
             // PTW should check PPN zero for large Page before call this function to write TLB
             ppn := pte(53,10)
+            size := pgsize
             switch (pgsize) {
                 is (pageSize.SZ_4K) {
                     vpn := va(38,12)
