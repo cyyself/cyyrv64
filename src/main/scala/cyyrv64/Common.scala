@@ -230,4 +230,13 @@ object RVCSR {
             ).foldLeft(0.U)( (result, field) => result | (field._1.asUInt << field._2).asUInt )
         }
     };
+    
+    class satp extends Bundle {
+        val mode = UInt(4.W)
+        val ppn  = UInt(44.W)
+
+        def getAddr(): UInt = {
+            (ppn << 12).asUInt
+        }
+    }
 }
