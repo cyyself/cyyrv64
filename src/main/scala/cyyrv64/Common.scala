@@ -1,6 +1,7 @@
 package cyyrv64
 
 import chisel3._
+import chisel3.util._
 import chisel3.experimental.ChiselEnum
 
 object ALUOpSel extends ChiselEnum {
@@ -159,4 +160,74 @@ object RVPrivMode extends ChiselEnum {
     val User        = Value(0.U)
     val Supervisor  = Value(1.U)
     val Machine     = Value(3.U)
+}
+
+object RVCSR {
+    class status extends Bundle {
+        val sie  = Bool();  // supervisor interrupt enable
+        val mie  = Bool();  // machine interrupt enable
+        val spie = Bool();  // sie prior to trapping
+        val mpie = Bool();  // sie prior to trapping
+        val spp  = UInt(1.W);   // supervisor previous privilege mode.
+        val mpp  = UInt(2.W);   // machine previous privilege mode.
+        val mprv = Bool();  // Modify PRiVilege (Turn on virtual memory and protection for load/store in M-Mode) when mpp is not M-Mode
+        val sum  = Bool();  // permit Supervisor User Memory access
+        val mxr  = Bool();  // Make eXecutable Readable
+        val tvm  = Bool();  // Trap Virtual Memory (raise trap when sfence.vma and sinval.vma executing in S-Mode)
+        val tw   = Bool();  // Timeout Wait for WFI
+        val tsr  = Bool();  // Trap SRET
+
+        def fromMStatus(toWrite : UInt): Unit = {
+            sie  := toWrite(1)
+            mie  := toWrite(3)
+            spie := toWrite(5)
+            mpie := toWrite(7)
+            spp  := toWrite(8)
+            mpp  := toWrite(12,11)
+            mprv := toWrite(17)
+            sum  := toWrite(18)
+            mxr  := toWrite(19)
+            tvm  := toWrite(20)
+            tw   := toWrite(21)
+            tsr  := toWrite(22)
+        }
+
+        def fromSStatus(toWrite : UInt): Unit = {
+            sie  := toWrite(1)
+            spie := toWrite(5)
+            spp  := toWrite(8)
+            sum  := toWrite(18)
+            mxr  := toWrite(19)
+        }
+
+        def toMStatus(): UInt = {
+            Seq(
+                ( 1, sie),
+                ( 3, mie),
+                ( 5, spie),
+                ( 7, mpie),
+                ( 8, spp),
+                (11, mpp),
+                (17, mprv),
+                (18, sum),
+                (19, mxr),
+                (20, tvm),
+                (21, tw),
+                (22, tsr),
+                (32, 2.U),
+                (34, 2.U)
+            ).foldLeft(0.U)( (result, field) => result | (field._1.asUInt << field._2).asUInt )
+        }
+
+        def toSStatus(): UInt = {
+            Seq(
+                ( 1, sie),
+                ( 5, spie),
+                ( 8, spp),
+                (18, sum),
+                (19, mxr),
+                (32, 2.U),
+            ).foldLeft(0.U)( (result, field) => result | (field._1.asUInt << field._2).asUInt )
+        }
+    };
 }
