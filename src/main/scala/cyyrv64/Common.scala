@@ -230,13 +230,124 @@ object RVCSR {
             ).foldLeft(0.U)( (result, field) => result | (field._1.asUInt << field._2).asUInt )
         }
     };
-    
+
     class satp extends Bundle {
         val mode = UInt(4.W)
         val ppn  = UInt(44.W)
 
         def getAddr(): UInt = {
             (ppn << 12).asUInt
+        }
+    }
+
+    class ip extends Bundle {
+        // ext ip
+        val meip = Bool()
+        val msip = Bool()
+        val mtip = Bool()
+        val seip = Bool()
+        // sbi write ip
+        val ssip = Bool()
+        val stip = Bool()
+
+        // Since all ip to write is s*ip, and it can be write from s mode, one function is enough
+        def fromIP(toWrite: UInt): Unit = {
+            ssip := toWrite(1)
+            stip := toWrite(5)
+        }
+
+        def toMIP(): UInt = {
+            Seq(
+                ( 1.U, ssip),
+                ( 3.U, msip),
+                ( 5.U, stip),
+                ( 7.U, mtip),
+                ( 9.U, seip),
+                (11.U, meip)
+            ).foldLeft(0.U)( (result, field) => result | (field._1 << field._2).asUInt )
+        }
+
+        def toSIP(): UInt = {
+            Seq(
+                ( 1.U, ssip),
+                ( 5.U, stip),
+                ( 9.U, seip)
+            ).foldLeft(0.U)( (result, field) => result | (field._1 << field._2).asUInt )
+        }
+    }
+
+    class ie extends Bundle {
+        val meie = Bool()
+        val msie = Bool()
+        val mtie = Bool()
+        val seie = Bool()
+        val ssie = Bool()
+        val stie = Bool()
+
+        def fromMIE(toWrite: UInt): Unit = {
+            ssie := toWrite(1)
+            msie := toWrite(3)
+            stie := toWrite(5)
+            mtie := toWrite(7)
+            seie := toWrite(9)
+            meie := toWrite(11)
+        }
+
+        def fromSIE(toWrite: UInt): Unit = {
+            ssie := toWrite(1)
+            stie := toWrite(5)
+            seie := toWrite(9)
+        }
+
+        def toMIE(): UInt = {
+            Seq(
+                ( 1.U, ssie),
+                ( 3.U, msie),
+                ( 5.U, stie),
+                ( 7.U, mtie),
+                ( 9.U, seie),
+                (11.U, meie)
+            ).foldLeft(0.U)( (result, field) => result | (field._1 << field._2).asUInt )
+        }
+
+        def toSIE(): UInt = {
+            Seq(
+                ( 1.U, ssie),
+                ( 5.U, stie),
+                ( 9.U, seie)
+            ).foldLeft(0.U)( (result, field) => result | (field._1 << field._2).asUInt )
+        }
+    }
+
+    class mideleg extends Bundle {
+        val seid = Bool()
+        val ssid = Bool()
+        val stid = Bool()
+
+        def read(): UInt = {
+            Seq(
+                (1.U, ssid),
+                (5.U, stid),
+                (9.U, seid)
+            ).foldLeft(0.U)((result, field) => result | (field._1 << field._2).asUInt)
+        }
+
+        def write(toWrite: UInt): Unit = {
+            ssid := toWrite(1)
+            stid := toWrite(5)
+            seid := toWrite(9)
+        }
+    }
+
+    class medeleg extends Bundle {
+        val stor = UInt(16.W)
+
+        def read(): UInt = {
+            stor
+        }
+
+        def write(toWrite: UInt): Unit = {
+            stor := Cat(toWrite(15,12),false.B,toWrite(10,0))
         }
     }
 }
