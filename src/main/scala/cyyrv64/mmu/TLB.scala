@@ -1,11 +1,12 @@
-package cyyrv64.mmu
+package cyyrv64
 
 import chisel3._
 import chisel3.util._
 import chisel3.experimental.ChiselEnum
 
 object pageSize extends ChiselEnum {
-    val Invalid, SZ_4K, SZ_2M, SZ_1G = Value
+    val Invalid = Value(0.U)
+    val SZ_4K, SZ_2M, SZ_1G = Value
 }
 
 class TLBEntry extends Bundle {
@@ -68,5 +69,41 @@ class TLBEntry extends Bundle {
                 }
             }
         }
+    }
+
+    def ifCheck(privMode: RVPrivMode.type): Bool = { // return false should raise page fault
+        // Note: mprv didn't affect instr fetch.
+        val priv_ok = false.B
+        switch (privMode) {
+            is (RVPrivMode.User) {
+                priv_ok := U
+            }
+            is (RVPrivMode.Supervisor) {
+                priv_ok := !U
+            }
+            is (RVPrivMode.Machine) {
+                assert(false, "Should not check permission when M Mode")
+            }
+        }
+        A && X && priv_ok
+    }
+
+    def lsCheck(privMode: RVPrivMode.type, write: Bool, mxr: Bool, sum: Bool): Bool = {
+        // Note: privMode should be value after mprv
+        val priv_ok = false.B
+        val read_permit = R || (mxr && X)
+        val write_permit = D && W
+        switch (privMode) {
+            is (RVPrivMode.User) {
+                priv_ok := U
+            }
+            is (RVPrivMode.Supervisor) {
+                priv_ok := !U || sum
+            }
+            is (RVPrivMode.Machine) {
+                assert(false, "Should not check permission when M Mode or mprv to M Mode")
+            }
+        }
+        A && priv_ok && Mux(write,write_permit,read_permit)
     }
 }
