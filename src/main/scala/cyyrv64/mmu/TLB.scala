@@ -71,7 +71,7 @@ class TLBEntry extends Bundle {
         }
     }
 
-    def ifCheck(privMode: RVPrivMode.type): Bool = { // return false should raise page fault
+    def ifCheck(privMode: RVPrivMode.Type): Bool = { // return false should raise page fault
         // Note: mprv didn't affect instr fetch.
         val priv_ok = false.B
         switch (privMode) {
@@ -88,7 +88,7 @@ class TLBEntry extends Bundle {
         A && X && priv_ok
     }
 
-    def lsCheck(privMode: RVPrivMode.type, write: Bool, mxr: Bool, sum: Bool): Bool = {
+    def lsCheck(privMode: RVPrivMode.Type, write: Bool, mxr: Bool, sum: Bool): Bool = {
         // Note: privMode should be value after mprv
         val priv_ok = false.B
         val read_permit = R || (mxr && X)
