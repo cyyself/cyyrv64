@@ -22,24 +22,36 @@ class TLBEntry extends Bundle {
 
     val size = pageSize()
 
-    def query(va : UInt): (Bool, UInt) = {
-        val ok = false.B
-        val pa = 0.U
+    def checkHit(va : UInt): Bool = {
+        val ok = WireDefault(false.B)
         switch (size) {
             is (pageSize.SZ_4K) {
                 ok := va(63,12).asSInt === vpn.asSInt
-                pa := Cat(ppn,va(11,0)).asUInt
             }
             is (pageSize.SZ_2M) {
                 ok := va(63,21).asSInt === vpn(26,9).asSInt
-                pa := Cat(ppn(43,9),va(20,0)).asUInt
             }
             is (pageSize.SZ_1G) {
                 ok := va(63,30).asSInt === vpn(26,18).asSInt
+            }
+        }
+        ok
+    }
+
+    def va2pa(va : UInt): UInt = {
+        val pa = WireDefault(0.U)
+        switch (size) {
+            is (pageSize.SZ_4K) {
+                pa := Cat(ppn,va(11,0)).asUInt
+            }
+            is (pageSize.SZ_2M) {
+                pa := Cat(ppn(43,9),va(20,0)).asUInt
+            }
+            is (pageSize.SZ_1G) {
                 pa := Cat(ppn(43,18),va(29,0)).asUInt
             }
         }
-        (ok, pa)
+        pa
     }
 
     def invalidate(): Unit = {
@@ -73,7 +85,7 @@ class TLBEntry extends Bundle {
 
     def ifCheck(privMode: RVPrivMode.Type): Bool = { // return false should raise page fault
         // Note: mprv didn't affect instr fetch.
-        val priv_ok = false.B
+        val priv_ok = WireDefault(false.B)
         switch (privMode) {
             is (RVPrivMode.User) {
                 priv_ok := U
@@ -90,7 +102,7 @@ class TLBEntry extends Bundle {
 
     def lsCheck(privMode: RVPrivMode.Type, write: Bool, mxr: Bool, sum: Bool): Bool = {
         // Note: privMode should be value after mprv
-        val priv_ok = false.B
+        val priv_ok = WireDefault(false.B)
         val read_permit = R || (mxr && X)
         val write_permit = D && W
         switch (privMode) {
@@ -105,5 +117,22 @@ class TLBEntry extends Bundle {
             }
         }
         A && priv_ok && Mux(write,write_permit,read_permit)
+    }
+}
+
+class TLB(size: Int = 8) {
+    val tlbe = RegInit(0.U.asTypeOf(Vec(size, new TLBEntry)))
+    val random = Counter(size)
+    def insertFromPTE(pte: UInt, va: UInt, pgsize: pageSize.Type): Unit = {
+        tlbe(random.value).fromPTE(pte,va,pgsize)
+        random.inc()
+    }
+    def queryByVA(va: UInt) : (Bool, TLBEntry) = {
+        val hitMap = tlbe.map(_.checkHit(va))
+        val hitEntry = Mux1H(hitMap, tlbe) // Note: if TLB didn't flush properly, multiple hot will happen
+        (VecInit(hitMap).asUInt.orR, hitEntry)
+    }
+    def invalidateAll(): Unit = {
+        tlbe.foreach(each => each.invalidate())
     }
 }
