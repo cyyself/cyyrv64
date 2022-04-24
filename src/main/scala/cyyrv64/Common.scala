@@ -162,6 +162,11 @@ object RVPrivMode extends ChiselEnum {
     val Machine     = Value(3.U)
 }
 
+object RVSAMode extends ChiselEnum {
+    val Bare    = Value(0.U)
+    val Sv39    = Value(8.U)
+}
+
 object RVCSR {
     class status extends Bundle {
         val sie  = Bool();  // supervisor interrupt enable
@@ -232,11 +237,34 @@ object RVCSR {
     };
 
     class satp extends Bundle {
-        val mode = UInt(4.W)
+        val mode = RVSAMode()
         val ppn  = UInt(44.W)
 
         def getAddr(): UInt = {
             (ppn << 12).asUInt
+        }
+
+        def getMode(): RVSAMode.Type = {
+            mode
+        }
+
+        def read(): UInt = {
+            val res = ppn
+            switch (mode) {
+                is (RVSAMode.Sv39) {
+                    res := res | (8.U << 60).asUInt
+                }
+            }
+            res
+        }
+
+        def write(toWrite: UInt): Unit = {
+            ppn := toWrite(43, 0)
+            when(toWrite(63, 60) === 8.U) {
+                mode := RVSAMode.Sv39
+            }.otherwise {
+                mode := RVSAMode.Bare
+            }
         }
     }
 
@@ -349,5 +377,20 @@ object RVCSR {
         def write(toWrite: UInt): Unit = {
             stor := Cat(toWrite(15,12),false.B,toWrite(10,0))
         }
+    }
+}
+
+class MMUInfo extends Bundle {
+    val cur_priv = RVPrivMode()
+    val satp = new RVCSR.satp
+    val mxr = Bool()
+    val sum = Bool()
+    def default(): MMUInfo = {
+        val res = new MMUInfo
+        res.cur_priv := RVPrivMode.Machine
+        res.satp := 0.U.asTypeOf(new RVCSR.satp)
+        res.mxr := false.B
+        res.sum := false.B
+        res
     }
 }

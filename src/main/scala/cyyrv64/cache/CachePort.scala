@@ -22,6 +22,10 @@ object COReqType extends ChiselEnum {
     val rel_shared, rel_modified = Value
 }
 
+object L2Resp extends ChiselEnum {
+    val OK, ERR = Value
+}
+
 class L2DataChannel extends Bundle {
     val reqType = Output(L2ReqType())
     val reqAddr = Output(UInt(64.W))
@@ -29,12 +33,14 @@ class L2DataChannel extends Bundle {
     val reqValid = Output(Bool())
     val reqReady = Input(Bool())
     val rData = Input(UInt(64.W))
-    val wData = Output(UInt(64.W))
-    val wStrb = Output(UInt(8.W))
+    val rResp = Input(L2Resp())
     val rValid = Input(Bool())
     val rReady = Output(Bool())
     val wValid = Output(Bool())
-    val wReady = Input(Bool())
+    val wData = Output(UInt(64.W))
+    val wStrb = Output(UInt(8.W))
+    val wResp = Input(L2Resp())
+    val wReady = Input(Bool()) // when wReady, wResp become valid
 }
 
 class L2CoherenceChannel extends Bundle {
