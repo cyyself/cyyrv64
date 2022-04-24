@@ -249,13 +249,7 @@ object RVCSR {
         }
 
         def read(): UInt = {
-            val res = ppn
-            switch (mode) {
-                is (RVSAMode.Sv39) {
-                    res := res | (8.U << 60).asUInt
-                }
-            }
-            res
+            ppn | Mux(mode === RVSAMode.Sv39, (8.U << 60).asUInt, 0.U)
         }
 
         def write(toWrite: UInt): Unit = {
@@ -386,7 +380,7 @@ class MMUInfo extends Bundle {
     val mxr = Bool()
     val sum = Bool()
     def default(): MMUInfo = {
-        val res = new MMUInfo
+        val res = WireDefault(0.U.asTypeOf(new MMUInfo))
         res.cur_priv := RVPrivMode.Machine
         res.satp := 0.U.asTypeOf(new RVCSR.satp)
         res.mxr := false.B
