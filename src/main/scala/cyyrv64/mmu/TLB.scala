@@ -136,3 +136,35 @@ class TLB(size: Int = 8) {
         tlbe.foreach(each => each.invalidate())
     }
 }
+
+class Sv39PTWInfo extends Bundle {
+    val va = UInt(64.W)
+    val baseAddr = UInt(64.W)
+    val curLevel = UInt(2.W)
+
+    def PTEAddr(level: UInt): UInt = {
+        val res = WireDefault(0.U(64.W))
+        switch (level) {
+            is (2.U) {
+                res := baseAddr + (va(38,30) << 3)
+            }
+            is (1.U) {
+                res := baseAddr + (va(29,21) << 3)
+            }
+            is (0.U) {
+                res := baseAddr + (va(20,12) << 3)
+            }
+        }
+        res
+    }
+
+    def setBase(newBase: UInt): Unit = {
+        baseAddr := newBase
+    }
+
+    def reset(newVA: UInt, newBaseAddr: UInt): Unit = {
+        va := newVA
+        baseAddr := newBaseAddr
+        curLevel := 3.U
+    }
+}
