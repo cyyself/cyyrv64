@@ -19,7 +19,7 @@ enum alu_op {
 
 #define binary_concat(value,r,l,shift) ((((value)>>(l))&((1<<((r)-(l)+1))-1))<<(shift))
 
-#define PC_ALIGN 2
+#define PC_ALIGN 4
 
 class rv_core {
 public:
@@ -45,10 +45,10 @@ public:
         return pc;
     }
 private:
-    uint64_t pc = 0;
     uint32_t trace_size = run_riscv_test ? 128 : 0;
     std::queue <uint64_t> trace;
     rv_systembus &systembus;
+    uint64_t pc = 0;
     rv_priv priv;
     int64_t GPR[32];
     void exec(bool meip, bool msip, bool mtip, bool seip) {
@@ -520,6 +520,10 @@ private:
                                                     }
                                                     else {
                                                         printf("Failed with value 0x%lx\n",GPR[10]);
+                                                        while (!trace.empty()) {
+                                                            printf("%lx\n",trace.front());
+                                                            trace.pop();
+                                                        }
                                                         exit(1);
                                                     }
                                                 }
@@ -633,6 +637,8 @@ private:
             }
         }
         else {
+            ri = true;
+            /*
             // rvc
             uint8_t rvc_opcode = ( (cur_instr & 0b11) << 3) | ((cur_instr >> 13) & 0b111);
             uint8_t rs2 = (cur_instr >> 2) & 0x1f;
@@ -884,6 +890,7 @@ private:
                 default:
                     ri = true;
             }
+            */
         }
     exception:
         if (ri) {

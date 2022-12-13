@@ -21,14 +21,17 @@ wire id_stall;
 wire ex_stall;
 wire me_stall;
 
-wire if_ready = !id_stall && !ex_stall && !me_stall;
-wire id_ready = !ex_stall && !me_stall;
-wire ex_ready = !me_stall;
-wire me_ready = 1'b1;
-
 wire id_flush = mem_pc_en;
 wire ex_flush = mem_pc_en;
 wire me_flush = mem_pc_en;
+
+wire id_stall_real = id_stall && !id_flush;
+wire ex_stall_real = ex_stall && !ex_flush;
+
+wire if_ready = !id_stall_real && !ex_stall_real && !me_stall;
+wire id_ready = !ex_stall_real && !me_stall;
+wire ex_ready = !me_stall;
+wire me_ready = 1'b1;
 
 // GPR
 gpr_forward ex_forward;

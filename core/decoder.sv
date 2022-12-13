@@ -148,7 +148,7 @@ always_comb begin
                 imm = imm_itype;
                 case (funct3)
                     FUNCT3_ADD_SUB: pack.alu_opt = ADD;
-                    FUNCT3_SLT:     pack.alu_opt = SLT;
+                    FUNCT3_SLL:     pack.alu_opt = SLL;
                     FUNCT3_SRL_SRA: pack.alu_opt = instr[30] ? SRA : SRL;
                     default: illegal_instr = 1;
                 endcase

@@ -13,6 +13,7 @@ wire [63:0] in2_ext = is_word ? {{33{in2[31]}},in2[30:0]} : in2;
 
 wire [5:0]  shamt = {is_word?1'b0:in2[5],in2[4:0]};
 wire [63:0] srl_in1 = is_word ? {32'd0,in1[31:0]} : in1[63:0];
+wire [63:0] sra_in1 = is_word ? {{32{in1[31]}},in1[31:0]} : in1[63:0];
 
 logic [63:0] res;
 
@@ -28,7 +29,7 @@ always_comb begin
         SLTU: res = {63'd0,in1_ext < in2_ext};
         XOR:  res = in1_ext ^ in2_ext;
         SRL:  res = srl_in1 >> shamt;
-        SRA:  res = $signed(srl_in1) >> shamt;
+        SRA:  res = $signed(sra_in1) >>> shamt;
         OR:   res = in1_ext | in2_ext;
         AND:  res = in1_ext & in2_ext;
         default: begin
