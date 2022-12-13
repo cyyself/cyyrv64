@@ -27,6 +27,8 @@ void assert(bool expr) {
 #include <sstream>
 
 bool run_riscv_test = false;
+bool dump_pc_history = false;
+const uint64_t commit_timeout = 500;
 
 void connect_wire(axi4_ptr <32,64,4> &mmio_ptr, Vtop_axi_wrapper *top) {
     // connect
@@ -115,6 +117,7 @@ void workbench_run(Vtop_axi_wrapper *top, axi4_ref <32,64,4> &mmio_ref) {
 
     uint64_t rst_ticks = 10;
     uint64_t ticks = 0;
+    uint64_t last_commit = ticks;
     while (!Verilated::gotFinish() && sim_time > 0 && running) {
         if (rst_ticks  > 0) {
             top->reset = 1;
@@ -135,6 +138,7 @@ void workbench_run(Vtop_axi_wrapper *top, axi4_ref <32,64,4> &mmio_ref) {
         }
         if (top->clock && top->debug_commit) { // instr retire
             cemu_rvcore.step(0,0,0,0);
+            last_commit = ticks;
             if (top->debug_pc != cemu_rvcore.debug_pc || 
                 cemu_rvcore.debug_reg_num != 0 && (
                     top->debug_reg_num != cemu_rvcore.debug_reg_num || 
@@ -145,6 +149,7 @@ void workbench_run(Vtop_axi_wrapper *top, axi4_ref <32,64,4> &mmio_ref) {
                 printf("reference: PC = 0x%016lx, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%016lx\n", cemu_rvcore.debug_pc, cemu_rvcore.debug_reg_num, cemu_rvcore.debug_reg_wdata);
                 printf("mycpu    : PC = 0x%016lx, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%016lx\n", top->debug_pc, top->debug_reg_num, top->debug_wdata);
                 running = false;
+                if (dump_pc_history) cemu_rvcore.dump_pc_history();
             }
         }
         if (trace_on) {
@@ -152,6 +157,11 @@ void workbench_run(Vtop_axi_wrapper *top, axi4_ref <32,64,4> &mmio_ref) {
             sim_time --;
         }
         ticks ++;
+        if (ticks - last_commit >= commit_timeout) {
+            printf("Error!\nCPU stuck for %ld cycles!\n", commit_timeout / 2);
+            running = false;
+            if (dump_pc_history) cemu_rvcore.dump_pc_history();
+        }
     }
     if (trace_on) vcd.close();
     top->final();
@@ -206,6 +216,7 @@ void riscv_test_run(Vtop_axi_wrapper *top, axi4_ref <32,64,4> &mmio_ref, const c
 
     uint64_t rst_ticks = 10;
     uint64_t ticks = 0;
+    uint64_t last_commit = ticks;
     while (!Verilated::gotFinish() && sim_time > 0 && running) {
         if (rst_ticks  > 0) {
             top->reset = 1;
@@ -222,6 +233,7 @@ void riscv_test_run(Vtop_axi_wrapper *top, axi4_ref <32,64,4> &mmio_ref, const c
         }
         if (top->clock && top->debug_commit) { // instr retire
             cemu_rvcore.step(0,0,0,0);
+            last_commit = ticks;
             if (top->debug_pc != cemu_rvcore.debug_pc || 
                 cemu_rvcore.debug_reg_num != 0 && (
                     top->debug_reg_num != cemu_rvcore.debug_reg_num || 
@@ -232,6 +244,7 @@ void riscv_test_run(Vtop_axi_wrapper *top, axi4_ref <32,64,4> &mmio_ref, const c
                 printf("reference: PC = 0x%016lx, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%016lx\n", cemu_rvcore.debug_pc, cemu_rvcore.debug_reg_num, cemu_rvcore.debug_reg_wdata);
                 printf("mycpu    : PC = 0x%016lx, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%016lx\n", top->debug_pc, top->debug_reg_num, top->debug_wdata);
                 running = false;
+                if (dump_pc_history) cemu_rvcore.dump_pc_history();
             }
         }
         if (trace_on) {
@@ -239,6 +252,11 @@ void riscv_test_run(Vtop_axi_wrapper *top, axi4_ref <32,64,4> &mmio_ref, const c
             sim_time --;
         }
         ticks ++;
+        if (ticks - last_commit >= commit_timeout) {
+            printf("Error!\nCPU stuck for %ld cycles!\n", commit_timeout / 2);
+            running = false;
+            if (dump_pc_history) cemu_rvcore.dump_pc_history();
+        }
     }
     printf("total_ticks: %lu\n", ticks);
 }
@@ -263,6 +281,9 @@ int main(int argc, char** argv, char** env) {
         else if (strcmp(argv[i],"-rvtest") == 0) {
             run_riscv_test = true;
             run_mode = RISCV_TEST;
+        }
+        else if (strcmp(argv[i],"-pc") == 0) {
+            dump_pc_history = true;
         }
         else {
             file_load_path = argv[i];

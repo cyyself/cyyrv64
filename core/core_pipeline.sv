@@ -59,7 +59,7 @@ csr csr_inst(
     .clock          (clock),
     .reset          (reset),
     .ext_int        (ext_int),
-    .ready_instret  (1'b0), // TODO
+    .ready_instret  (debug.commit),
     .cur_priv_mode  (priv_mode),
     .trap_if        (trap_if),
     .csr_if         (csr_if),

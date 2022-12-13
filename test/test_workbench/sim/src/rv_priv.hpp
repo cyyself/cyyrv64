@@ -26,7 +26,7 @@ public:
         csr_mstatus_def *mstatus = (csr_mstatus_def*)&status;
         mstatus->uxl = 2;
         csr_misa_def *isa = (csr_misa_def*)&misa;
-        isa->ext = rv_ext('i') | rv_ext('m') | rv_ext('a') | rv_ext('u');
+        isa->ext = rv_ext('i') | rv_ext('m') | rv_ext('u');
         isa->mxl = 2; // rv64
         isa->blank = 0;
         medeleg = 0;

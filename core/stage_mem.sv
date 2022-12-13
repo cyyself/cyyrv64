@@ -57,7 +57,7 @@ assign d_bus.addr   = me_data_from_ex.mem_addr;
 assign d_bus.size   = me_data_from_ex.pack.mem_size;
 assign d_bus.write  = me_data_from_ex.pack.mem_write;
 assign d_bus.fence_i= me_data_from_ex.pack.fence_i;
-assign d_bus.ready  = me_ready && !if_stall;
+assign d_bus.ready  = (me_ready && !if_stall) || me_flush;
 // d_bus }
 
 // exception {
@@ -69,8 +69,8 @@ assign trap_info_mem_new.tval  = me_data.mem_addr;
 trap_info trap_info_mem;
 assign trap_info_mem = me_data.trap.trap_en ? me_data.trap : trap_info_mem_new;
 
-assign trap_if.trap_en = trap_info_mem.trap_en;
-assign trap_if.mret_en = me_data.pack.mret;
+assign trap_if.trap_en = trap_info_mem.trap_en && !me_stall && me_ready;
+assign trap_if.mret_en = me_data.pack.mret && !me_stall && me_ready;
 assign trap_if.pc = me_data.pc;
 assign trap_if.cause = {trap_info_mem.trap_is_int,59'd0,trap_info_mem.cause};
 assign trap_if.tval = trap_info_mem.tval;

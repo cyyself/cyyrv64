@@ -11,6 +11,7 @@ module i_no_cache (
 enum { IDLE, READ, FINISH_WAIT } status;
 
 assign ibus.valid = status == FINISH_WAIT;
+wire addr_err = |ibus.addr[63:32];
 
 always_ff @(posedge clock) begin
     if (reset) begin
@@ -28,9 +29,15 @@ always_ff @(posedge clock) begin
         case(status)
             IDLE: begin
                 if (ibus.en) begin
-                    axi_bus.araddr <= {ibus.addr[31:2],2'd0};
-                    axi_bus.arvalid <= 1;
-                    status <= READ;
+                    if (addr_err) begin
+                        ibus.acc_err <= 1'b1;
+                        status <= FINISH_WAIT;
+                    end
+                    else begin
+                        axi_bus.araddr <= {ibus.addr[31:2],2'd0};
+                        axi_bus.arvalid <= 1;
+                        status <= READ;
+                    end
                 end
             end
             READ: begin
@@ -43,12 +50,18 @@ always_ff @(posedge clock) begin
             end
             FINISH_WAIT: begin
                 if (ibus.ready) begin
+                    ibus.acc_err <= 1'b0;
                     if (ibus.en) begin // same as idle
-                        axi_bus.araddr <= ibus.addr[31:0];
-                        axi_bus.arvalid <= 1;
-                        status <= READ;
+                        if (addr_err) begin
+                            ibus.acc_err <= 1'b1;
+                            status <= FINISH_WAIT;
+                        end
+                        else begin
+                            axi_bus.araddr <= {ibus.addr[31:2],2'd0};
+                            axi_bus.arvalid <= 1;
+                            status <= READ;
+                        end
                     end
-                    else status <= IDLE;
                 end
             end
         endcase

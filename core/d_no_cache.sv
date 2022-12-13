@@ -25,6 +25,8 @@ end
 
 assign dbus.valid = status == FINISH_WAIT;
 
+wire addr_err = |dbus.addr[63:32];
+
 always_ff @(posedge clock) begin
     if (reset) begin
         // reset all reg
@@ -51,20 +53,26 @@ always_ff @(posedge clock) begin
         case (status)
             IDLE: begin
                 if (dbus.en) begin
-                    if (dbus.write) begin
-                        axi_bus.awaddr <= dbus.addr[31:0];
-                        axi_bus.awsize <= {1'b0,dbus.size};
-                        axi_bus.awvalid <= 1;
-                        axi_bus.wdata  <= dbus.wdata;
-                        axi_bus.wstrb  <= wstrb_gen;
-                        axi_bus.wvalid <= 1;
-                        status <= WRITE;
+                    if (addr_err) begin
+                        dbus.acc_err <= 1'b1;
+                        status <= FINISH_WAIT;
                     end
                     else begin
-                        axi_bus.araddr <= dbus.addr[31:0];
-                        axi_bus.arsize <= {1'b0,dbus.size};
-                        axi_bus.arvalid <= 1;
-                        status <= READ;
+                        if (dbus.write) begin
+                            axi_bus.awaddr <= dbus.addr[31:0];
+                            axi_bus.awsize <= {1'b0,dbus.size};
+                            axi_bus.awvalid <= 1;
+                            axi_bus.wdata  <= dbus.wdata;
+                            axi_bus.wstrb  <= wstrb_gen;
+                            axi_bus.wvalid <= 1;
+                            status <= WRITE;
+                        end
+                        else begin
+                            axi_bus.araddr <= dbus.addr[31:0];
+                            axi_bus.arsize <= {1'b0,dbus.size};
+                            axi_bus.arvalid <= 1;
+                            status <= READ;
+                        end
                     end
                 end
             end
@@ -86,21 +94,28 @@ always_ff @(posedge clock) begin
             end
             FINISH_WAIT: begin
                 if (dbus.ready) begin
+                    dbus.acc_err <= 1'b0;
                     if (dbus.en) begin
-                        if (dbus.write) begin
-                            axi_bus.awaddr <= dbus.addr[31:0];
-                            axi_bus.awsize <= {1'b0,dbus.size};
-                            axi_bus.awvalid <= 1;
-                            axi_bus.wdata  <= dbus.wdata;
-                            axi_bus.wstrb  <= wstrb_gen;
-                            axi_bus.wvalid <= 1;
-                            status <= WRITE;
+                        if (addr_err) begin
+                            dbus.acc_err <= 1'b1;
+                            status <= FINISH_WAIT;
                         end
                         else begin
-                            axi_bus.araddr <= dbus.addr[31:0];
-                            axi_bus.arsize <= {1'b0,dbus.size};
-                            axi_bus.arvalid <= 1;
-                            status <= READ;
+                            if (dbus.write) begin
+                                axi_bus.awaddr <= dbus.addr[31:0];
+                                axi_bus.awsize <= {1'b0,dbus.size};
+                                axi_bus.awvalid <= 1;
+                                axi_bus.wdata  <= dbus.wdata;
+                                axi_bus.wstrb  <= wstrb_gen;
+                                axi_bus.wvalid <= 1;
+                                status <= WRITE;
+                            end
+                            else begin
+                                axi_bus.araddr <= dbus.addr[31:0];
+                                axi_bus.arsize <= {1'b0,dbus.size};
+                                axi_bus.arvalid <= 1;
+                                status <= READ;
+                            end
                         end
                     end
                     else status <= IDLE;

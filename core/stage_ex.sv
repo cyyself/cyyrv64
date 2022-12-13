@@ -101,7 +101,7 @@ bru bru_inst(
 );
 
 wire [63:0] branch_jal_addr = ex_data.pc + ex_data.imm;
-wire [63:0] jalr_addr = ex_data.rs1 + ex_data.imm;
+wire [63:0] jalr_addr = ex_data.rs1 + {ex_data.imm[63:1],1'b0};
 
 wire ex_ctrl_trans = (ex_data.pack.br_en && branch_taken) || ex_data.pack.jump || ex_data.pack.flush_pipe;
 wire [63:0] ex_ctrl_trans_addr = 
@@ -137,9 +137,8 @@ wire memory_misaligned_trap = ex_data.pack.mem_en && memory_addr_misaligned;
 wire csr_trap = ex_data.pack.csr_en && csr_if.trap_ill;
 
 trap_info trap_info_ex_new;
-assign trap_info_ex_new.trap_en = memory_misaligned_trap || csr_trap;
+assign trap_info_ex_new.trap_en = memory_misaligned_trap || ex_ctrl_trans_misaligned || ex_data.pack.ebreak || ex_data.pack.ecall || csr_trap;
 assign trap_info_ex_new.trap_is_int = 0;
-// TODO: ecall, ebreak
 assign trap_info_ex_new.cause = 
     ({4{memory_misaligned_trap}}    & (ex_data.pack.mem_write ? EXC_STORE_MISALIGN : EXC_LOAD_MISALIGNED) ) |
     ({4{ex_ctrl_trans_misaligned}}  & EXC_INSTR_MISALIGN ) |

@@ -44,8 +44,17 @@ public:
     uint64_t getPC() {
         return pc;
     }
+    void dump_pc_history() {
+        printf("----- PC HISTORY BEGIN-----\n");
+        while (!trace.empty()) {
+            uint64_t pc_history = trace.front();
+            trace.pop();
+            printf("%016lx\n",pc_history);
+        }
+        printf("----- PC HISTORY  END  -----\n");
+    }
 private:
-    uint32_t trace_size = run_riscv_test ? 128 : 0;
+    uint32_t trace_size = run_riscv_test ? 32 : 0;
     std::queue <uint64_t> trace;
     rv_systembus &systembus;
     uint64_t pc = 0;
@@ -95,7 +104,6 @@ private:
                 break;
             case OPCODE_JAL: {
                 uint64_t npc = pc + ((inst->j_type.imm_20 << 20) | (inst->j_type.imm_19_12 << 12) | (inst->j_type.imm_11 << 11) | (inst->j_type.imm_10_1 << 1));
-                if (npc & 1) npc ^= 1; // we don't need to check.
                 if (npc % PC_ALIGN) priv.raise_trap(csr_cause_def(exc_instr_misalign),npc);
                 else {
                     set_GPR(inst->j_type.rd,pc + 4);
@@ -105,8 +113,8 @@ private:
                 break;
             }
             case OPCODE_JALR: {
+                if (inst->i_type.imm12 & 1) inst->i_type.imm12 ^= 1;
                 uint64_t npc = GPR[inst->i_type.rs1] + inst->i_type.imm12;
-                if (npc & 1) npc ^= 1;
                 if (npc % PC_ALIGN) priv.raise_trap(csr_cause_def(exc_instr_misalign),npc);
                 else {
                     set_GPR(inst->j_type.rd,pc + 4);

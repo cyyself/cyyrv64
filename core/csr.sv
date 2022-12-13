@@ -91,17 +91,15 @@ always_comb begin // read and permission check
 end
 
 always_comb begin // trap address generator
+    trap_pc_if.trap_en = 1'b0;
+    trap_pc_if.trap_pc = 0;
     if (trap_if.trap_en) begin
         trap_pc_if.trap_en = 1'b1;
         trap_pc_if.trap_pc = {mtvec.base,2'd00} + (mtvec.mode == TMODE_VECTORED ? trap_if.cause[3:0] * 4: 0);
     end
-    else begin
-        if (trap_if.mret_en) begin
-            trap_pc_if.trap_en = 1'b1;
-            trap_pc_if.trap_pc = mepc;
-        end
-        trap_pc_if.trap_en = 1'b0;
-        trap_pc_if.trap_pc = 0;
+    else if (trap_if.mret_en) begin
+        trap_pc_if.trap_en = 1'b1;
+        trap_pc_if.trap_pc = mepc;
     end
 end
 
@@ -186,14 +184,6 @@ always_ff @(posedge clock) begin
         end
         // do csr op }
         // do exception and mret {
-        assert(!(trap_if.mret_en && trap_if.trap_en))
-        if (trap_if.mret_en) begin
-            status.mie  <= status.mpie;
-            status.mpie <= 1'b1;
-            priv_mode   <= status.mpp;
-            if (status.mpp != MACHINE_MODE) status.mprv <= 0;
-            status.mpp  <= 0;
-        end
         if (trap_if.trap_en) begin
             mcause      <= trap_if.cause;
             mtval       <= trap_if.tval;
@@ -202,6 +192,13 @@ always_ff @(posedge clock) begin
             status.mie  <= 0;
             status.mpp  <= priv_mode;
             priv_mode   <= MACHINE_MODE;
+        end
+        else if (trap_if.mret_en) begin
+            status.mie  <= status.mpie;
+            status.mpie <= 1'b1;
+            priv_mode   <= status.mpp;
+            if (status.mpp != MACHINE_MODE) status.mprv <= 0;
+            status.mpp  <= 0;
         end
         // do exception and mret }
     end

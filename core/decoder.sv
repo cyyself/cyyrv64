@@ -2,8 +2,6 @@
 `include "def_csr.svh"
 `include "def_decoder.svh"
 
-// TODO: AMO
-
 module decoder (
     input               en,
     input  [31:0]       instr,
@@ -332,6 +330,7 @@ always_comb begin
                         pack.csr_en = 1;
                         pack.csr_opt = |rs1 ? CSR_WRITE : CSR_READ;
                         pack.rs1_en = 1;
+                        pack.csr_rs1_as_imm = 1;
                         pack.rd_en = 1;
                         imm = imm_itype;
                     end
@@ -339,6 +338,7 @@ always_comb begin
                         pack.csr_en = 1;
                         pack.csr_opt = |rs1 ? CSR_SETBIT : CSR_READ;
                         pack.rs1_en = 1;
+                        pack.csr_rs1_as_imm = 1;
                         pack.rd_en = 1;
                         imm = imm_itype;
                     end
@@ -346,6 +346,7 @@ always_comb begin
                         pack.csr_en = 1;
                         pack.csr_opt = |rs1 ? CSR_CLEARBIT : CSR_READ;
                         pack.rs1_en = 1;
+                        pack.csr_rs1_as_imm = 1;
                         pack.rd_en = 1;
                         imm = imm_itype;
                     end

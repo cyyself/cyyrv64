@@ -1,8 +1,6 @@
 `ifndef DEF_SVH
 `define DEF_SVH
 
-`define ENABLE_AMO
-
 typedef enum {
     ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND
 } alu_op;
@@ -128,8 +126,13 @@ interface data_bus;
     logic           ready;  // tell the cache this transfer is done
     logic           fence_i;// write back all dcache. (Note: fence_i can only asserted when en is 0.)
     logic           acc_err;// access fault
-    modport slave (input  addr, size, en, write, amo_en, amo_type, wdata, ready, fence_i, output rdata, valid, acc_err);
-    modport master(output addr, size, en, write, amo_en, amo_type, wdata, ready, fence_i, acc_err, input  rdata, valid);    
+`ifdef ENABLE_AMO
+    modport slave (input  addr, size, en, write, amo_32, amo_en, amo_type, wdata, ready, fence_i, output rdata, valid, acc_err);
+    modport master(output addr, size, en, write, amo_32, amo_en, amo_type, wdata, ready, fence_i, acc_err, input  rdata, valid);    
+`else
+    modport slave (input  addr, size, en, write, wdata, ready, fence_i, output rdata, valid, acc_err);
+    modport master(output addr, size, en, write, wdata, ready, fence_i, acc_err, input  rdata, valid);    
+`endif
 endinterface
 
 interface trap_bus;
