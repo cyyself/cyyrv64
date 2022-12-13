@@ -142,8 +142,8 @@ void workbench_run(Vtop_axi_wrapper *top, axi4_ref <32,64,4> &mmio_ref) {
                 ) 
             ) {
                 printf("Error!\n");
-                printf("reference: PC = 0x%016x, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%016x\n", cemu_rvcore.debug_pc, cemu_rvcore.debug_reg_num, cemu_rvcore.debug_reg_wdata);
-                printf("mycpu    : PC = 0x%016x, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%016x\n", top->debug_pc, top->debug_reg_num, top->debug_wdata);
+                printf("reference: PC = 0x%016lx, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%016lx\n", cemu_rvcore.debug_pc, cemu_rvcore.debug_reg_num, cemu_rvcore.debug_reg_wdata);
+                printf("mycpu    : PC = 0x%016lx, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%016lx\n", top->debug_pc, top->debug_reg_num, top->debug_wdata);
                 running = false;
             }
         }
