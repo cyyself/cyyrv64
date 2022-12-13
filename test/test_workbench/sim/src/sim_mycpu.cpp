@@ -1,6 +1,8 @@
 #include "verilated.h"
 #include "verilated_vcd_c.h"
 #include "Vtop_axi_wrapper.h"
+#include "rv_systembus.hpp"
+#include "rv_core.hpp"
 
 bool running = true;
 #undef assert
@@ -23,6 +25,8 @@ void assert(bool expr) {
 #include <thread>
 #include <csignal>
 #include <sstream>
+
+bool run_riscv_test = false;
 
 void connect_wire(axi4_ptr <32,64,4> &mmio_ptr, Vtop_axi_wrapper *top) {
     // connect
@@ -92,6 +96,16 @@ void workbench_run(Vtop_axi_wrapper *top, axi4_ref <32,64,4> &mmio_ref) {
     std::thread *uart_input_thread = new std::thread(uart_input,std::ref(uart));
     assert(mmio.add_dev(0x60100000,0x10000,&uart));
     
+    // setup cemu {
+    rv_systembus cemu_system_bus;
+    mmio_mem cemu_boot_ram(262144*4, "../soft/start.bin");
+    uartlite cemu_uart;
+    assert(cemu_system_bus.add_dev(0x60000000,0x100000,&cemu_boot_ram));
+    assert(cemu_system_bus.add_dev(0x60100000,1024*1024,&cemu_uart));
+    rv_core cemu_rvcore(cemu_system_bus,0);
+    cemu_rvcore.jump(0x60000000);
+    // setup cemu }
+
     // connect Vcd for trace
     VerilatedVcdC vcd;
     if (trace_on) {
@@ -116,6 +130,20 @@ void workbench_run(Vtop_axi_wrapper *top, axi4_ref <32,64,4> &mmio_ref) {
             if (uart.exist_tx()) {
                 printf("%c",uart.getc());
                 fflush(stdout);
+            }
+        }
+        if (top->clock && top->debug_commit) { // instr retire
+            cemu_rvcore.step(0,0,0,0);
+            if (top->debug_pc != cemu_rvcore.debug_pc || 
+                cemu_rvcore.debug_reg_num != 0 && (
+                    top->debug_reg_num != cemu_rvcore.debug_reg_num || 
+                    top->debug_wdata   != cemu_rvcore.debug_reg_wdata
+                ) 
+            ) {
+                printf("Error!\n");
+                printf("reference: PC = 0x%016x, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%016x\n", cemu_rvcore.debug_pc, cemu_rvcore.debug_reg_num, cemu_rvcore.debug_reg_wdata);
+                printf("mycpu    : PC = 0x%016x, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%016x\n", top->debug_pc, top->debug_reg_num, top->debug_wdata);
+                running = false;
             }
         }
         if (trace_on) {
