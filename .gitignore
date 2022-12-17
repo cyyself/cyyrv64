@@ -1,0 +1,4 @@
+.*
+*.vcd
+obj_dir
+*.gtkw
