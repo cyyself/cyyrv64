@@ -307,7 +307,7 @@ always_comb begin
                     // For CSRs, immediate represent CSR address, not wdata.
                     FUNCT3_CSRRW: begin
                         pack.csr_en = 1;
-                        pack.csr_opt = |rs1 ? CSR_WRITE : CSR_READ;
+                        pack.csr_opt = CSR_WRITE;
                         pack.rs1_en = 1;
                         pack.rd_en = 1;
                         imm = imm_itype;
@@ -328,7 +328,7 @@ always_comb begin
                     end
                     FUNCT3_CSRRWI: begin
                         pack.csr_en = 1;
-                        pack.csr_opt = |rs1 ? CSR_WRITE : CSR_READ;
+                        pack.csr_opt = CSR_WRITE;
                         pack.rs1_en = 1;
                         pack.csr_rs1_as_imm = 1;
                         pack.rd_en = 1;
