@@ -148,7 +148,7 @@ always_ff @(posedge clock) begin
         priv_mode <= MACHINE_MODE;
     end
     else begin
-        // Update counter, whatever it will replaced by CSR writes
+        // Update counter, whatever will it replaced by CSR writes
         cycle <= cycle + 1;
         if (ready_instret) instret <= instret + 1;
         // Update interrupts
@@ -162,7 +162,7 @@ always_ff @(posedge clock) begin
                     status.mie  <= mstatus_wdata.mie;
                     status.mpie <= mstatus_wdata.mpie;
                     status.mpp  <= (mstatus_wdata.mpp == MACHINE_MODE || mstatus_wdata.mpp == USER_MODE) ? mstatus_wdata.mpp : 0;
-                    status.mprv <= mstatus_wdata.mprv; // As we don't neither PMP nor MMU, so set to mprv has no side effect. 
+                    status.mprv <= mstatus_wdata.mprv; // As we implemented neither PMP nor MMU, so set to mprv has no side effect. 
                 end
                 CSR_MIE: begin
                     ie.MEIP     <= csr_wdata_final[{2'd0,INT_MEI}];
